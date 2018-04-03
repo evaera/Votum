@@ -1,0 +1,6 @@
+{
+	"extends": "tslint-config-standard",
+	"rules": {
+		"no-angle-bracket-type-assertion": false
+	}
+}
