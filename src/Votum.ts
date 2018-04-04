@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as Commando from 'discord.js-commando'
 import * as Discord from 'discord.js'
 import * as Commands from './commands'
+import Command from './commands/Command'
 import Council from './Council'
 
 class Votum {
@@ -10,13 +11,16 @@ class Votum {
 
   constructor () {
     this.bot = new Commando.CommandoClient({
-      owner: process.env.OWNER
+      owner: process.env.OWNER,
+      unknownCommandResponse: false
     })
 
     this.councilMap = new Map()
     this.registerCommands()
 
     this.bot.login(process.env.TOKEN)
+
+    console.log('Votum is ready.')
   }
 
   public static bootstrap (): Votum {
@@ -47,7 +51,15 @@ class Votum {
       })
       .registerCommands(Object.values(Commands))
 
-      console.log(Object.values(Commands))
+    this.bot.dispatcher.addInhibitor(msg => {
+      const council = this.getCouncil(msg.channel.id)
+
+      if (council.enabled === false && (msg.command as Command).councilOnly) {
+        return 'outside_council'
+      }
+
+      return false
+    })
   }
 }
 

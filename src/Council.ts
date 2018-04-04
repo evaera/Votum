@@ -1,32 +1,31 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { Snowflake } from 'discord.js'
+import { Snowflake, Role } from 'discord.js'
 import onChange = require('on-change')
 import Votum from './Votum'
-
-interface Motion {
-  author: Snowflake,
-  authorName: Snowflake,
-  id: number
-}
+import Motion, { MotionData } from './Motion'
 
 interface CouncilData {
   enabled: boolean,
+  name: string,
   announceChannel: Snowflake | null,
+  councilorRole: Snowflake | null,
   userCooldown: number,
-  motions: Motion[]
+  motions: MotionData[]
 }
 
 export default class Council {
   private static defaultSettings: CouncilData = {
     enabled: false,
+    name: 'Council',
+    councilorRole: null,
     announceChannel: null,
     userCooldown: 0,
     motions: []
   }
 
   public id: Snowflake
-  public data: CouncilData
+  private data: CouncilData
   private dataPath: string
 
   constructor (id: Snowflake) {
@@ -34,6 +33,30 @@ export default class Council {
 
     this.dataPath = path.join(__dirname, `../data/${this.id}.json`)
     this.loadData()
+  }
+
+  public get enabled () {
+    return this.data.enabled
+  }
+
+  public set enabled (state: boolean) {
+    this.data.enabled = state
+  }
+
+  public get name () {
+    return this.data.name
+  }
+
+  public set name (state: string) {
+    this.data.name = state
+  }
+
+  public get councilorRole (): Snowflake | null {
+    return this.data.councilorRole
+  }
+
+  public set councilorRole (role: Snowflake | null) {
+    this.data.councilorRole = role
   }
 
   private loadData (): void {

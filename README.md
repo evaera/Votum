@@ -5,7 +5,7 @@ A Discord bot for managing small party voting systems such as a council or small
 ## Goals
 
 - [x] Load and save data per council
-- [ ] Define councils on a per-channel basis
+- [x] Define councils on a per-channel basis
 - [ ] Start motions
 - [ ] Ability to vote on motions, display data and accept reasons
   - [ ] Multiple vote types

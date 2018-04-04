@@ -8,13 +8,11 @@ export default class YesCommand extends Command {
     super(client, {
       name: 'yes',
       aliases: ['aye', 'si', 'yea', 'yay'],
-      description: 'test',
+      description: 'test'
     })
   }
 
-  async run (msg: CommandMessage, args: any[]): Promise<Message | Message[]> {
-    const council = Votum.getCouncil(msg.channel.id)
-
+  async execute (msg: CommandMessage, args: any[]): Promise<Message | Message[]> {
     return msg.reply('Yes')
   }
 }
