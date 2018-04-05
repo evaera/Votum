@@ -44,6 +44,10 @@ export default class MotionCommand extends Command {
       return msg.reply('There is already an active motion.')
     }
 
+    if (this.council.isUserOnCooldown(msg.author.id)) {
+      return msg.reply(`You must wait ${+(this.council.userCooldown / 3600000).toFixed(2)} hours between motions. (${+(this.council.getUserCooldown(msg.author.id) / 3600000).toFixed(2)} hours left)`)
+    }
+
     let text: string[] = args.text.split(' ')
     let voteType = MotionVoteType.Majority
 

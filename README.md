@@ -9,7 +9,7 @@ A Discord bot for managing small party voting systems such as a council or small
 - [x] Start motions
 - [x] Ability to vote on motions, display data and accept reasons
   - [ ] Multiple vote types
-- [ ] Implement user cooldown
+- [x] Implement user cooldown
 - [x] Ability to kill a motion
 - [x] Settings for when a motion passes: unanimous, majority
 - [x] Detect when a motion has passed or failed

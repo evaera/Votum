@@ -10,6 +10,7 @@ interface CouncilData {
   announceChannel?: Snowflake,
   councilorRole?: Snowflake,
   userCooldown: number,
+  userCooldowns: { [index: string]: number },
   motions: MotionData[]
 }
 
@@ -18,6 +19,7 @@ export default class Council {
     enabled: false,
     name: 'Council',
     userCooldown: 0,
+    userCooldowns: {},
     motions: []
   }
 
@@ -66,6 +68,14 @@ export default class Council {
     this.data.councilorRole = role
   }
 
+  public get userCooldown (): number {
+    return this.data.userCooldown
+  }
+
+  public set userCooldown (role: number) {
+    this.data.userCooldown = role
+  }
+
   public get size (): number {
     const roleId = this.councilorRole || '0'
     const role = this.channel.guild.roles.get(roleId)
@@ -83,6 +93,26 @@ export default class Council {
         return new Motion(motion, this)
       }
     }
+  }
+
+  public isUserOnCooldown (id: Snowflake): boolean {
+    if (!this.data.userCooldowns[id]) {
+      return false
+    }
+
+    if (Date.now() - this.data.userCooldowns[id] < this.data.userCooldown) {
+      return true
+    }
+
+    return false
+  }
+
+  public getUserCooldown (id: Snowflake): number {
+    return this.userCooldown - (Date.now() - (this.data.userCooldowns[id] || 0))
+  }
+
+  public setUserCooldown (id: Snowflake, time: number = Date.now()): void {
+    this.data.userCooldowns[id] = time
   }
 
   public getMotion(id: number): Motion {

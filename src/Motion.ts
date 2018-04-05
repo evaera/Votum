@@ -134,8 +134,12 @@ export default class Motion {
     this.data.active = false
     this.data.resolution = resolution
 
-    if (this.council.announceChannel && (resolution === MotionResolution.Failed || resolution == MotionResolution.Passed)) {
-      this.postMessage('', this.council.channel.guild.channels.get(this.council.announceChannel) as TextChannel)
+    if (resolution === MotionResolution.Failed || resolution == MotionResolution.Passed) {
+      this.council.setUserCooldown(this.data.authorId, this.data.createdAt)
+
+      if (this.council.announceChannel) {
+        this.postMessage('', this.council.channel.guild.channels.get(this.council.announceChannel) as TextChannel)
+      }
     }
   }
 
@@ -159,7 +163,7 @@ export default class Motion {
     const votes = this.getVotes()
 
     if (votes.yes === 0 && votes.no === 0) {
-      return `This new motion requires ${votes.toPass} vote${votes.toPass === 1 ? '' : 's'} to pass or fail.`
+      return `This motion requires ${votes.toPass} vote${votes.toPass === 1 ? '' : 's'} to pass or fail.`
     } else if (votes.yes >= votes.no) {
       return `With ${votes.toPass - votes.yes} more vote${votes.toPass - votes.yes === 1 ? '' : 's'} for this motion, it will pass.`
     } else if (votes.no > votes.yes) {
