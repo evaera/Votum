@@ -2,10 +2,10 @@ import { CommandoClient, CommandMessage } from 'discord.js-commando'
 import { Message, TextChannel } from 'discord.js'
 import Command from '../Command'
 
-export default class CouncilorRoleCommand extends Command {
+export default class MotionAnnounceChannelCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
-      name: 'councilannouncechannel',
+      name: 'motionannouncechannel',
       description: 'Designates a specific channel where announcements of all passing motions will be posted.',
       adminOnly: true,
 

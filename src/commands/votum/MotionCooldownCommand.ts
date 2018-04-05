@@ -5,7 +5,8 @@ import Command from '../Command'
 export default class MotionCooldownCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
-      name: 'motioncooldown',
+      name: 'councilorcooldown',
+      aliases: ['motioncooldown'],
       description: 'Set the number of hours a councilor must wait between proposing motions.',
       adminOnly: true,
 
@@ -13,7 +14,7 @@ export default class MotionCooldownCommand extends Command {
         {
           key: 'cooldown',
           prompt: 'The cooldown to enforce between motions per councilor, in hours.',
-          type: 'integer'
+          type: 'float'
         }
       ]
     })

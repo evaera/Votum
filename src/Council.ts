@@ -11,6 +11,7 @@ interface CouncilData {
   councilorRole?: Snowflake,
   userCooldown: number,
   userCooldowns: { [index: string]: number },
+  motionExpiration: number,
   motions: MotionData[]
 }
 
@@ -19,6 +20,7 @@ export default class Council {
     enabled: false,
     name: 'Council',
     userCooldown: 0,
+    motionExpiration: 0,
     userCooldowns: {},
     motions: []
   }
@@ -74,6 +76,14 @@ export default class Council {
 
   public set userCooldown (role: number) {
     this.data.userCooldown = role
+  }
+
+  public get motionExpiration (): number {
+    return this.data.motionExpiration
+  }
+
+  public set motionExpiration (role: number) {
+    this.data.motionExpiration = role
   }
 
   public get size (): number {

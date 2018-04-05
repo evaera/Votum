@@ -1,7 +1,7 @@
 import { CommandoClient, CommandMessage } from 'discord.js-commando'
 import { Message } from 'discord.js'
 import Command from '../Command'
-import Motion, { MotionVoteType, MotionResolution } from '../../Motion'
+import { MotionVoteType, MotionResolution } from '../../Motion'
 
 export default class MotionCommand extends Command {
   constructor (client: CommandoClient) {
@@ -64,6 +64,7 @@ export default class MotionCommand extends Command {
       voteType,
       active: true,
       resolution: MotionResolution.Unresolved,
+      didExpire: false,
       votes: []
     })
 

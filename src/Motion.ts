@@ -23,6 +23,7 @@ export interface MotionData {
   voteType: MotionVoteType,
   createdAt: number,
   deletedAt?: number,
+  didExpire: boolean,
   votes: MotionVote[]
 }
 
@@ -50,6 +51,10 @@ export default class Motion {
 
   public get author (): Snowflake {
     return this.data.authorId
+  }
+
+  public get isExpired (): boolean {
+    return !!(this.council.motionExpiration && Date.now() - this.data.createdAt > this.council.motionExpiration)
   }
 
   public async postMessage (text?: string | true, channel?: TextChannel): Promise<Message | Message[]> {
@@ -131,8 +136,13 @@ export default class Motion {
   }
 
   public resolve (resolution: MotionResolution): void {
+    if (this.data.active === false) {
+      throw new Error('Attempt to resolve a resolved motion.')
+    }
+
     this.data.active = false
     this.data.resolution = resolution
+    this.data.didExpire = this.isExpired
 
     if (resolution === MotionResolution.Failed || resolution == MotionResolution.Passed) {
       this.council.setUserCooldown(this.data.authorId, this.data.createdAt)
@@ -146,6 +156,14 @@ export default class Motion {
   private checkVotes (): void {
     const votes = this.getVotes()
 
+    if (this.isExpired) {
+      if (votes.yes > votes.no) {
+        this.resolve(MotionResolution.Passed)
+      } else if (votes.no > votes.yes) {
+        this.resolve(MotionResolution.Failed)
+      }
+    }
+
     if (votes.yes >= votes.toPass) {
       this.resolve(MotionResolution.Passed)
     } else if (this.data.voteType === MotionVoteType.Unanimous && votes.no > 0) {
@@ -157,12 +175,14 @@ export default class Motion {
 
   private getVoteHint (): string {
     if (this.data.active === false) {
-      return `Results final.` + (this.data.voteType === MotionVoteType.Unanimous ? ' (Unanimous vote was required)' : '')
+      return `Results final.` + (this.data.voteType === MotionVoteType.Unanimous ? ' (Unanimous vote was required)' : '') + (this.data.didExpire ? ' (Motion expired.)' : '')
     }
 
     const votes = this.getVotes()
 
-    if (votes.yes === 0 && votes.no === 0) {
+    if (votes.yes === votes.no && this.isExpired) {
+      return `The motion is expired, but is tied. The next vote will close the motion.`
+    } else if (votes.yes === 0 && votes.no === 0) {
       return `This motion requires ${votes.toPass} vote${votes.toPass === 1 ? '' : 's'} to pass or fail.`
     } else if (votes.yes >= votes.no) {
       return `With ${votes.toPass - votes.yes} more vote${votes.toPass - votes.yes === 1 ? '' : 's'} for this motion, it will pass.`
