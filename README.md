@@ -13,5 +13,5 @@ A Discord bot for managing small party voting systems such as a council or small
 - [x] Ability to kill a motion
 - [x] Settings for when a motion passes: unanimous, majority
 - [x] Detect when a motion has passed or failed
-- [ ] Motion expiration
+- [x] Motion expiration
 - [x] Define which people can vote or call motions
