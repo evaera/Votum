@@ -28,7 +28,7 @@ export default class Command extends Commando.Command {
     super(client, info)
 
     this.councilOnly = typeof customInfo.councilOnly === 'undefined' ? true : customInfo.councilOnly
-    this.adminOnly = typeof customInfo.adminOnly === 'undefined' ? true : customInfo.adminOnly
+    this.adminOnly = typeof customInfo.adminOnly === 'undefined' ? false : customInfo.adminOnly
   }
 
   public hasPermission (msg: Commando.CommandMessage): boolean {

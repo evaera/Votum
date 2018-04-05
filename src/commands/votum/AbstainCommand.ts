@@ -1,14 +1,14 @@
 import { CommandoClient } from 'discord.js-commando'
 import VoteAliasCommand from './VoteAliasCommand'
 
-export default class YesCommand extends VoteAliasCommand {
-  protected state: 1 | 0 | -1 = 1
+export default class AbstainCommand extends VoteAliasCommand {
+  protected state: 1 | 0 | -1 = 0
 
   constructor (client: CommandoClient) {
     super(client, {
-      name: 'yes',
-      aliases: ['aye', 'si', 'yea', 'yay', 'ja'],
-      description: 'Vote yes on a motion',
+      name: 'abstain',
+      aliases: ['abs', 'sitout', 'sit-out'],
+      description: 'Abstain on a motion',
 
       args: [
         {

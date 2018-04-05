@@ -1,4 +1,3 @@
-import * as path from 'path'
 import * as Commando from 'discord.js-commando'
 import * as Discord from 'discord.js'
 import * as Commands from './commands'
@@ -6,7 +5,7 @@ import Command from './commands/Command'
 import Council from './Council'
 
 class Votum {
-  private bot: Commando.CommandoClient
+  public bot: Commando.CommandoClient
   private councilMap: Map<Discord.Snowflake, Council>
 
   constructor () {
@@ -18,9 +17,9 @@ class Votum {
     this.councilMap = new Map()
     this.registerCommands()
 
-    this.bot.login(process.env.TOKEN)
+    this.bot.on('ready', () => console.log('Votum is ready.'))
 
-    console.log('Votum is ready.')
+    this.bot.login(process.env.TOKEN)
   }
 
   public static bootstrap (): Votum {
@@ -32,7 +31,13 @@ class Votum {
       return this.councilMap.get(id) as Council
     }
 
-    const council = new Council(id)
+    const channel = this.bot.channels.get(id)
+
+    if (channel == null) {
+      throw new Error("Channel doesn't exist.")
+    }
+
+    const council = new Council(channel as Discord.TextChannel)
     this.councilMap.set(id, council)
 
     return council
@@ -54,7 +59,7 @@ class Votum {
     this.bot.dispatcher.addInhibitor(msg => {
       const council = this.getCouncil(msg.channel.id)
 
-      if (council.enabled === false && (msg.command as Command).councilOnly) {
+      if (council.enabled === false && msg.command && (msg.command as Command).councilOnly) {
         return 'outside_council'
       }
 

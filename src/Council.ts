@@ -1,35 +1,34 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { Snowflake, Role } from 'discord.js'
+import { Snowflake, TextChannel } from 'discord.js'
 import onChange = require('on-change')
-import Votum from './Votum'
 import Motion, { MotionData } from './Motion'
 
 interface CouncilData {
   enabled: boolean,
   name: string,
-  announceChannel: Snowflake | null,
-  councilorRole: Snowflake | null,
+  announceChannel?: Snowflake,
+  councilorRole?: Snowflake,
   userCooldown: number,
   motions: MotionData[]
 }
 
 export default class Council {
-  private static defaultSettings: CouncilData = {
+  private static defaultData: CouncilData = {
     enabled: false,
     name: 'Council',
-    councilorRole: null,
-    announceChannel: null,
     userCooldown: 0,
     motions: []
   }
 
   public id: Snowflake
+  public channel: TextChannel
   private data: CouncilData
   private dataPath: string
 
-  constructor (id: Snowflake) {
-    this.id = id
+  constructor (channel: TextChannel) {
+    this.channel = channel
+    this.id = channel.id
 
     this.dataPath = path.join(__dirname, `../data/${this.id}.json`)
     this.loadData()
@@ -51,21 +50,64 @@ export default class Council {
     this.data.name = state
   }
 
-  public get councilorRole (): Snowflake | null {
+  public get announceChannel (): string | undefined {
+    return this.data.announceChannel
+  }
+
+  public set announceChannel (channelId: string | undefined) {
+    this.data.announceChannel = channelId
+  }
+
+  public get councilorRole (): Snowflake | undefined {
     return this.data.councilorRole
   }
 
-  public set councilorRole (role: Snowflake | null) {
+  public set councilorRole (role: Snowflake | undefined) {
     this.data.councilorRole = role
+  }
+
+  public get size (): number {
+    const roleId = this.councilorRole || '0'
+    const role = this.channel.guild.roles.get(roleId)
+
+    if (role) {
+      return role.members.size
+    } else {
+      return this.channel.members.size
+    }
+  }
+
+  public get currentMotion (): Motion | undefined {
+    for (const motion of this.data.motions) {
+      if (motion.active) {
+        return new Motion(motion, this)
+      }
+    }
+  }
+
+  public getMotion(id: number): Motion {
+    const motion = this.data.motions[id]
+
+    if (motion == null) {
+      throw new Error(`Motion ID ${id} for council ${this.id} does not exist.`)
+    }
+
+    return new Motion(motion, this)
+  }
+
+  public createMotion(data: MotionData): Motion {
+    this.data.motions.push(data)
+
+    return new Motion(data, this)
   }
 
   private loadData (): void {
     let data: CouncilData
     try {
       const parsedSettings = JSON.parse(fs.readFileSync(this.dataPath, { encoding: 'utf8' }))
-      data = Object.assign({}, Council.defaultSettings, parsedSettings)
+      data = Object.assign({}, JSON.parse(JSON.stringify(Council.defaultData)), parsedSettings)
     } catch (e) {
-      data = JSON.parse(JSON.stringify(Council.defaultSettings))
+      data = JSON.parse(JSON.stringify(Council.defaultData))
     }
 
     this.data = onChange(data, () => {
