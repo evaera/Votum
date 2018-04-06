@@ -21,8 +21,8 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!CouncilorRole remove` | Remove the councilor role.
 | `!MotionAnnounceChannel <channel>` | Designate a channel where all passed and failed (not killed) motions will be logged.
 | `!MotionAnnounceChannel remove` | Remove the announce channel.
-| `!MotionExpire <hours>` | Set the number of hours a motion can remain active. Default `0`.
-| `!CouncilorCooldown <hours>` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown).
+| `!MotionExpire <hours>` | Set the number of hours a motion can remain active. Default `0` (expiration disabled).
+| `!CouncilorCooldown <hours>` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown). Default `0` (no cooldown).
 
 ### Councilor commnads
 | Command         | Description |
