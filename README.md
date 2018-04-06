@@ -1,12 +1,12 @@
 <p align="center">
-  <a href="https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=8"><img src="https://i.imgur.com/pnEEVdz.png" alt="Votum" /></a>
+  <a href="https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=85000"><img src="https://i.imgur.com/pnEEVdz.png" alt="Votum" /></a>
 </p>
 
 # Votum
 
 A Discord bot for managing small party voting systems such as a council or small group who want to deliberate on matters democratically. Work in progress.
 
-[Invite Votum to your server](https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=8)
+[Invite Votum to your server](https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=85000)
 
 ## Commands
 
