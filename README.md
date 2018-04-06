@@ -31,8 +31,8 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!motion <motion text>` | Call a motion with the given text.
 | `!motion -u <motion text>` | Call a unanimous motion with the given text (any "no" vote will end the motion).
 | `!motion kill` | Kill the current motion. (Only admins or the motion author can do this).
-| `!yes | aye | si | yea | yay | ja | oui <reason>` | Vote yes with a mandatory reason.
-| `!no | nay | negative | nope | nein <reason>` | Vote no with a mandatory reason.
+| `!yes \| aye \| si \| yea \| yay \| ja \| oui <reason>` | Vote yes with a mandatory reason.
+| `!no \| nay \| negative \| nope \| nein <reason>` | Vote no with a mandatory reason.
 | `!abstain [reason]` | Abstain from voting with an optional reason.
 
 ## Voting
@@ -65,5 +65,7 @@ Contributions and suggestions are welcome.
 - [x] Detect when a motion has passed or failed
 - [x] Motion expiration
 - [x] Define which people can vote or call motions
+- [ ] Add status message and web page to show where to invite from Discord
 - [ ] Allow mandatory reasons to be configurable
 - [ ] A command to show historical motion history
+- [ ] Update to support sharding
