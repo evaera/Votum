@@ -11,7 +11,8 @@ class Votum {
   constructor () {
     this.bot = new Commando.CommandoClient({
       owner: process.env.OWNER,
-      unknownCommandResponse: false
+      unknownCommandResponse: false,
+      commandEditableDuration: 120
     })
 
     this.councilMap = new Map()
