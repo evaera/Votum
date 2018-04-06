@@ -164,11 +164,11 @@ export default class Motion {
       }
     }
 
-    if (votes.yes >= votes.toPass) {
+    if (votes.yes > votes.toPass) {
       this.resolve(MotionResolution.Passed)
     } else if (this.data.voteType === MotionVoteType.Unanimous && votes.no > 0) {
       this.resolve(MotionResolution.Failed)
-    } else if (votes.no >= votes.toPass || votes.toPass === 0) {
+    } else if (votes.no > votes.toPass || votes.toPass === 0) {
       this.resolve(MotionResolution.Failed)
     }
   }
