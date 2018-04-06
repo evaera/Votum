@@ -196,7 +196,7 @@ export default class Motion {
   private getVotesAsEmoji (): string {
     const votes = this.getVotes()
 
-    return `:thumbsup: **Aye** ${votes.yes}\n\n:thumbsdown: **Nay** ${votes.no}\n\n:flag_white: **Abstain** ${votes.abs}`
+    return `:thumbsup: **For** ${votes.yes}\n\n:thumbsdown: **Against** ${votes.no}\n\n:flag_white: **Abstain** ${votes.abs}`
   }
 
   private getVotesAsFields (): EmbedField[] {
