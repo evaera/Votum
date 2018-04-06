@@ -90,7 +90,7 @@ export default class Motion {
 
     return (channel || this.council.channel).send(typeof text !== 'undefined' ? (text === true ? '@everyone' : text) : '', { embed: {
       title,
-      description: this.data.text.replace('@', '@ ') + (text === true ? '' : '\n\n' + this.getVotesAsEmoji()),
+      description: this.data.text + (text === true ? '' : '\n\n' + this.getVotesAsEmoji()),
       author: {
         name: this.data.authorName,
         icon_url: author ? author.displayAvatarURL() : undefined
