@@ -1,12 +1,13 @@
 <p align="center">
   <a href="https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=85000"><img src="https://i.imgur.com/pnEEVdz.png" alt="Votum" /></a>
+  <br>
+  <a href="https://discordapp.com/oauth2/authorize?client_id=298796807323123712&scope=bot&permissions=402656264"><img src="https://i.imgur.com/2UBikON.png" alt="Add" /></a>
 </p>
+
 
 # Votum
 
 A Discord bot for managing small party voting systems such as a council or small group who want to deliberate on matters democratically. Work in progress.
-
-[Invite Votum to your server](https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=85000)
 
 ## Commands
 
@@ -25,6 +26,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!CouncilorCooldown <hours>` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown). Default `0` (no cooldown).
 
 ### Councilor commnads
+
 | Command         | Description |
 | -------------   | ----------- |
 | `!motion` | See the current motion.
