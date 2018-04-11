@@ -18,7 +18,11 @@ class Votum {
     this.councilMap = new Map()
     this.registerCommands()
 
-    this.bot.on('ready', () => console.log('Votum is ready.'))
+    this.bot.on('ready', () => {
+      console.log('Votum is ready.')
+
+      this.bot.user.setActivity('http://eryn.io/Votum')
+    })
 
     this.bot.login(process.env.TOKEN)
   }
