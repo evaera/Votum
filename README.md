@@ -67,7 +67,7 @@ Contributions and suggestions are welcome.
 - [x] Detect when a motion has passed or failed
 - [x] Motion expiration
 - [x] Define which people can vote or call motions
-- [ ] Add status message and web page to show where to invite from Discord
+- [x] Add status message and web page to show where to invite from Discord
 - [ ] Allow mandatory reasons to be configurable
 - [ ] A command to show historical motion history
 - [ ] Update to support sharding
