@@ -86,6 +86,14 @@ export default class Council {
     this.data.motionExpiration = role
   }
 
+  public get mentionString () {
+    if (this.data.councilorRole) {
+      return `<@&${this.data.councilorRole}>`
+    }
+
+    return ''
+  }
+
   public get size (): number {
     const roleId = this.councilorRole || '0'
     const role = this.channel.guild.roles.get(roleId)

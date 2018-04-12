@@ -88,7 +88,7 @@ export default class Motion {
       title = 'Motion Failed'
     }
 
-    return (channel || this.council.channel).send(typeof text !== 'undefined' ? (text === true ? '@everyone' : text) : '', { embed: {
+    return (channel || this.council.channel).send(typeof text !== 'undefined' ? (text === true ? this.council.mentionString : text) : '', { embed: {
       title,
       description: this.data.text + (text === true ? '' : '\n\n' + this.getVotesAsEmoji()),
       author: {
