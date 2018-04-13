@@ -73,5 +73,6 @@ Contributions and suggestions are welcome.
 - [x] Generalized configuration command
   - [ ] Allow mandatory reasons to be configurable
   - [ ] Allow motion mention to be configurable
+  - [ ] Configure percentage of votes needed to pass. 2/3rd, 4/5ths, etc
 - [ ] A command to show historical motion history
 - [ ] Update to support sharding
