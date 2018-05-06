@@ -71,7 +71,7 @@ export default class StatsCommand extends Command {
         lastMotion[motion.authorId] = motion.createdAt
 
         if (councilorNames[motion.authorId] == null) {
-          councilorNames[motion.authorId] = motion.authorName
+          councilorNames[motion.authorId] = motion.authorName + ' (retired)'
         }
       }
 
@@ -88,7 +88,7 @@ export default class StatsCommand extends Command {
           lastVoted[vote.authorId] = motion.createdAt
 
           if (councilorNames[vote.authorId] == null) {
-            councilorNames[vote.authorId] = vote.authorName
+            councilorNames[vote.authorId] = vote.authorName + ' (retired)'
           }
         }
       }
