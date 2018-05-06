@@ -1,4 +1,4 @@
-import { Snowflake, Message, TextChannel } from 'discord.js'
+import { Snowflake, Message, TextChannel, GuildMember, Collection } from 'discord.js'
 import Council from './Council'
 import Votum from './Votum'
 
@@ -62,7 +62,9 @@ export default class Motion {
 
     try {
       author = await Votum.bot.users.fetch(this.data.authorId)
-    } catch (e) {}
+    } catch (e) {
+      // do nothing
+    }
 
     if (this.data.active) {
       this.checkVotes()
@@ -144,13 +146,23 @@ export default class Motion {
     this.data.resolution = resolution
     this.data.didExpire = this.isExpired
 
-    if (resolution === MotionResolution.Failed || resolution == MotionResolution.Passed) {
+    if (resolution === MotionResolution.Failed || resolution === MotionResolution.Passed) {
       this.council.setUserCooldown(this.data.authorId, this.data.createdAt)
 
       if (this.council.announceChannel) {
         this.postMessage('', this.council.channel.guild.channels.get(this.council.announceChannel) as TextChannel)
       }
     }
+  }
+
+  public getRemainingVoters (): Collection<string, GuildMember> {
+    const votedUsers: {[index: string]: true} = {}
+
+    for (let vote of this.data.votes) {
+      votedUsers[vote.authorId] = true
+    }
+
+    return this.council.members.filter(member => !votedUsers[member.id] && !member.user.bot)
   }
 
   private checkVotes (): void {

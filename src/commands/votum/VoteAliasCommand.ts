@@ -2,20 +2,10 @@ import { CommandMessage } from 'discord.js-commando'
 import { Message } from 'discord.js'
 import Command from '../Command'
 import { CastVoteStatus } from '../../Motion'
-import Votum from '../../Votum';
+import Votum from '../../Votum'
 
 export default class VoteAliasCommand extends Command {
   protected state: 1 | 0 | -1
-
-  private getVoteName (msg: CommandMessage) {
-    let name = msg.command.name
-
-    if (msg.cleanContent.substring(0, 1) === Votum.bot.commandPrefix) {
-      name = msg.cleanContent.split(' ')[0].slice(1)
-    }
-
-    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
-  }
 
   async execute (msg: CommandMessage, args: any): Promise<Message | Message[]> {
     if (this.council.currentMotion == null) {
@@ -44,5 +34,15 @@ export default class VoteAliasCommand extends Command {
       case CastVoteStatus.Failed:
         return msg.reply("You can't vote on this motion.")
     }
+  }
+
+  private getVoteName (msg: CommandMessage) {
+    let name = msg.command.name
+
+    if (msg.cleanContent.substring(0, 1) === Votum.bot.commandPrefix) {
+      name = msg.cleanContent.split(' ')[0].slice(1)
+    }
+
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
   }
 }

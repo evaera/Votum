@@ -1,8 +1,8 @@
-import * as path from 'path'
+import { Collection, GuildMember, Snowflake, TextChannel } from 'discord.js'
 import * as fs from 'fs'
-import { Snowflake, TextChannel } from 'discord.js'
-import onChange = require('on-change')
+import * as path from 'path'
 import Motion, { MotionData } from './Motion'
+import onChange = require('on-change')
 
 interface CouncilData {
   enabled: boolean,
@@ -95,13 +95,17 @@ export default class Council {
   }
 
   public get size (): number {
+    return this.members.size
+  }
+
+  public get members (): Collection<Snowflake, GuildMember> {
     const roleId = this.councilorRole || '0'
     const role = this.channel.guild.roles.get(roleId)
 
     if (role) {
-      return role.members.size
+      return role.members
     } else {
-      return this.channel.members.size
+      return this.channel.members
     }
   }
 
@@ -133,7 +137,7 @@ export default class Council {
     this.data.userCooldowns[id] = time
   }
 
-  public getMotion(id: number): Motion {
+  public getMotion (id: number): Motion {
     const motion = this.data.motions[id]
 
     if (motion == null) {
@@ -143,7 +147,7 @@ export default class Council {
     return new Motion(motion, this)
   }
 
-  public createMotion(data: MotionData): Motion {
+  public createMotion (data: MotionData): Motion {
     this.data.motions.push(data)
 
     return new Motion(data, this)
@@ -160,7 +164,7 @@ export default class Council {
 
     this.data = onChange(data, () => {
       setTimeout(() => {
-        fs.writeFile(this.dataPath, JSON.stringify(this.data), () => {})
+        fs.writeFile(this.dataPath, JSON.stringify(this.data), () => undefined)
       }, 0)
     }) as CouncilData
   }

@@ -73,5 +73,8 @@ Contributions and suggestions are welcome.
 - [x] Generalized configuration command
   - [ ] Allow mandatory reasons to be configurable
   - [ ] Allow motion mention to be configurable
+- [x] Ping people who haven't voted yet
+- [ ] Stats command
+- [ ] Multiple majority types (2/3rd, 4/5th, configurable)
 - [ ] A command to show historical motion history
 - [ ] Update to support sharding
