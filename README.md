@@ -28,6 +28,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!MotionAnnounceChannel remove` | Remove the announce channel.
 | `!MotionExpire <hours>` | Set the number of hours a motion can remain active. Default `0` (expiration disabled).
 | `!CouncilorCooldown <hours>` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown). Default `0` (no cooldown).
+| `!CouncilStats` | Displays some statistics about your council.
 
 ### Councilor commnads
 
@@ -40,6 +41,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!yes \| aye \| si \| yea \| yay \| ja \| oui <reason>` | Vote yes with a mandatory reason.
 | `!no \| nay \| negative \| nope \| nein <reason>` | Vote no with a mandatory reason.
 | `!abstain [reason]` | Abstain from voting with an optional reason.
+| `!lazyvoters` | Mentions any council members who haven't voted on the current motion yet.
 
 ## Voting
 

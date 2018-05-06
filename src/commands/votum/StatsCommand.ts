@@ -43,9 +43,10 @@ function timeSince (date: number, zeroReplacement?: string) {
 export default class StatsCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
-      name: 'votumstats',
-      aliases: ['votestats'],
-      description: 'Show some stats about the past votes in your council.'
+      name: 'councilstats',
+      aliases: ['votestats', 'votumstats'],
+      description: 'Show some stats about the past votes in your council.',
+      adminOnly: true
     })
   }
 
