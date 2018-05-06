@@ -13,9 +13,9 @@ interface CustomCommandInfo {
 }
 
 export default class Command extends Commando.Command {
-  protected council: Council
   public councilOnly: boolean
   public adminOnly: boolean
+  protected council: Council
 
   constructor (client: Commando.CommandoClient, customInfo: CustomCommandInfo) {
     const info = customInfo as Commando.CommandInfo

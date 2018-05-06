@@ -117,6 +117,10 @@ export default class Council {
     }
   }
 
+  public get numMotions (): number {
+    return this.data.motions.length
+  }
+
   public isUserOnCooldown (id: Snowflake): boolean {
     if (!this.data.userCooldowns[id]) {
       return false

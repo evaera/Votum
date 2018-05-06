@@ -11,6 +11,8 @@
 
 A Discord bot for managing small party voting systems such as a council or small group who want to deliberate on matters democratically. Work in progress.
 
+Looking for a bot that provides quick on-the-fly poll-based votes to your entire community? Check out [Poll Dancer](https://eryn.io/PollDancer)
+
 ## Commands
 
 ### Admin commands
@@ -74,7 +76,7 @@ Contributions and suggestions are welcome.
   - [ ] Allow mandatory reasons to be configurable
   - [ ] Allow motion mention to be configurable
 - [x] Ping people who haven't voted yet
-- [ ] Stats command
+- [x] Stats command
 - [ ] Multiple majority types (2/3rd, 4/5th, configurable)
 - [ ] A command to show historical motion history
 - [ ] Update to support sharding

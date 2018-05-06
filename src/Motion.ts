@@ -49,12 +49,28 @@ export default class Motion {
     }
   }
 
-  public get author (): Snowflake {
+  public get authorId (): Snowflake {
     return this.data.authorId
+  }
+
+  public get authorName (): string {
+    return this.data.authorName
   }
 
   public get isExpired (): boolean {
     return !!(this.council.motionExpiration && Date.now() - this.data.createdAt > this.council.motionExpiration)
+  }
+
+  public get votes (): MotionVote[] {
+    return this.data.votes
+  }
+
+  public get createdAt (): number {
+    return this.data.createdAt
+  }
+
+  public get resolution (): MotionResolution {
+    return this.data.resolution
   }
 
   public async postMessage (text?: string | true, channel?: TextChannel): Promise<Message | Message[]> {
