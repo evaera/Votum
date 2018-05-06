@@ -128,9 +128,9 @@ diff@^3.2.0:
   dependencies:
     "@types/node" "^7.0.0"
 
-discord.js@hydrabolt/discord.js#master:
+"discord.js@https://github.com/discordjs/discord.js.git#e431ccdad2d539fe6f6e35a836a2c83cc6308cdf":
   version "12.0.0-dev"
-  resolved "https://codeload.github.com/hydrabolt/discord.js/tar.gz/90312952d91c6cf8fdea891f5cdc2478c81cec0d"
+  resolved "https://github.com/discordjs/discord.js.git#e431ccdad2d539fe6f6e35a836a2c83cc6308cdf"
   dependencies:
     pako "^1.0.0"
     prism-media "^0.2.0"

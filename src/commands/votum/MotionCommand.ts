@@ -32,7 +32,7 @@ export default class MotionCommand extends Command {
 
     if (this.council.currentMotion) {
       if (args.text === 'kill') {
-        if (this.council.currentMotion.author === msg.author.id || (msg.member.hasPermission('MANAGE_GUILD') || !!msg.member.roles.find('name', 'Votum Admin'))) {
+        if (this.council.currentMotion.authorId === msg.author.id || (msg.member.hasPermission('MANAGE_GUILD') || !!msg.member.roles.find('name', 'Votum Admin'))) {
           const motion = this.council.currentMotion
           motion.resolve(MotionResolution.Killed)
           return motion.postMessage()
