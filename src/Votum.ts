@@ -21,7 +21,8 @@ class Votum {
     this.bot.on('ready', () => {
       console.log('Votum is ready.')
 
-      this.bot.user.setActivity('http://eryn.io/Votum')
+      this.setActivity()
+      setInterval(this.setActivity.bind(this), 1000000)
     })
 
     this.bot.login(process.env.TOKEN)
@@ -46,6 +47,10 @@ class Votum {
     this.councilMap.set(id, council)
 
     return council
+  }
+
+  private setActivity (): void {
+    this.bot.user.setActivity('http://eryn.io/Votum')
   }
 
   private registerCommands (): void {
