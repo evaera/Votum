@@ -80,5 +80,6 @@ Contributions and suggestions are welcome.
 - [x] Ping people who haven't voted yet
 - [x] Stats command
 - [ ] Multiple majority types (2/3rd, 4/5th, configurable)
+- [ ] Configurable override to not end motions early when they reach majority.
 - [ ] A command to show historical motion history
 - [ ] Update to support sharding
