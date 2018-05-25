@@ -30,7 +30,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!CouncilorCooldown <hours>` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown). Default `0` (no cooldown).
 | `!CouncilStats` | Displays some statistics about your council.
 
-### Councilor commnads
+### Councilor commands
 
 | Command         | Description |
 | -------------   | ----------- |
