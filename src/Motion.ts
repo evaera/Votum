@@ -43,7 +43,7 @@ export default class Motion {
     this.council = council
 
     if (this.data.voteType === MotionVoteType.Majority) {
-      this.votesToPass = Math.floor(this.council.size / 2)
+      this.votesToPass = Math.ceil(this.council.size / 2)
     } else {
       this.votesToPass = this.council.size
     }
