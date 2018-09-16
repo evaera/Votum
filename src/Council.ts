@@ -2,7 +2,7 @@ import { Collection, GuildMember, Snowflake, TextChannel } from 'discord.js'
 import * as fs from 'fs'
 import * as path from 'path'
 import Motion, { MotionData } from './Motion'
-import onChange = require('on-change')
+import * as onChange from 'on-change'
 
 interface CouncilData {
   enabled: boolean,

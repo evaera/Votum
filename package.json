@@ -6,10 +6,10 @@
     "on-change": "^0.1.0"
   },
   "devDependencies": {
-    "@types/node": "^9.6.1",
+    "@types/node": "^10.9.4",
     "discord.js-typings": "https://github.com/discordjs/discord.js-typings.git#376000ebb8ee6f7287d6be387cae45d24b74bfa7",
-    "tslint": "^5.9.1",
+    "tslint": "^5.11.0",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "^2.8.1"
+    "typescript": "^3.0.3"
   }
 }
