@@ -211,6 +211,10 @@ export default class Motion {
   }
 
   private checkVotes (): void {
+    if (this.resolution !== MotionResolution.Unresolved) {
+      return
+    }
+
     const votes = this.getVotes()
 
     if (this.isExpired) {
