@@ -44,6 +44,14 @@ export default class MotionCommand extends Command {
       return msg.reply('There is already an active motion.')
     }
 
+    if (args.text === 'kill') {
+      return msg.reply('There is no motion active.')
+    }
+
+    if (args.text.length > 2000) {
+      return msg.reply('Your motion is too long. The maximum length is 2000 characters.')
+    }
+
     if (this.council.isUserOnCooldown(msg.author.id)) {
       return msg.reply(`You must wait ${+(this.council.userCooldown / 3600000).toFixed(2)} hours between motions. (${+(this.council.getUserCooldown(msg.author.id) / 3600000).toFixed(2)} hours left)`)
     }
