@@ -80,7 +80,7 @@ export default class ArchiveCommand extends Command {
     } else {
       const motion = this.council.getMotion(range[0] - 1)
 
-      return motion.postMessage(true, msg.channel as TextChannel)
+      return motion.postMessage('', msg.channel as TextChannel)
     }
 
   }
