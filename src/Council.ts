@@ -110,9 +110,9 @@ export default class Council {
   }
 
   public get currentMotion (): Motion | undefined {
-    for (const motion of this.data.motions) {
+    for (const [index, motion] of this.data.motions.entries()) {
       if (motion.active) {
-        return new Motion(motion, this)
+        return new Motion(index, motion, this)
       }
     }
   }
@@ -148,13 +148,13 @@ export default class Council {
       throw new Error(`Motion ID ${id} for council ${this.id} does not exist.`)
     }
 
-    return new Motion(motion, this)
+    return new Motion(id, motion, this)
   }
 
   public createMotion (data: MotionData): Motion {
     this.data.motions.push(data)
 
-    return new Motion(data, this)
+    return new Motion(this.data.motions.length - 1, data, this)
   }
 
   private loadData (): void {

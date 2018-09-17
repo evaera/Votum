@@ -39,12 +39,14 @@ function getEmbedLength (embed: any): number {
 
 export default class Motion {
   public council: Council
+  public motionIndex: number
   private data: MotionData
   private votesToPass: number
 
-  constructor (motionData: MotionData, council: Council) {
+  constructor (motionIndex: number, motionData: MotionData, council: Council) {
     this.data = motionData
     this.council = council
+    this.motionIndex = motionIndex
 
     if (this.data.voteType === MotionVoteType.Majority) {
       this.votesToPass = Math.ceil(this.council.size / 2)
@@ -59,6 +61,10 @@ export default class Motion {
 
   public get authorName (): string {
     return this.data.authorName
+  }
+
+  public get number (): number {
+    return this.motionIndex + 1
   }
 
   public get isExpired (): boolean {
@@ -95,19 +101,19 @@ export default class Motion {
       type = ' (unanimous)'
     }
 
-    let title
+    let title = `#${this.number} | `
     if (this.data.active) {
       if (text === true) {
-        title = 'New motion proposed' + type
+        title += 'New motion proposed' + type
       } else {
-        title = 'Currently active motion' + type
+        title += 'Currently active motion' + type
       }
     } else if (this.data.resolution === MotionResolution.Passed) {
-      title = 'Motion Passed' + type
+      title += 'Motion Passed' + type
     } else if (this.data.resolution === MotionResolution.Killed) {
-      title = 'Motion Killed'
+      title += 'Motion Killed'
     } else {
-      title = 'Motion Failed'
+      title += 'Motion Failed'
     }
 
     const votes = text === true ? '' : '\n\n' + this.getVotesAsEmoji()
