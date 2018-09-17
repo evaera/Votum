@@ -34,6 +34,10 @@ export default class Command extends Commando.Command {
   public hasPermission (msg: Commando.CommandMessage): boolean {
     const council = Votum.getCouncil(msg.channel.id)
 
+    if (this.client.isOwner(msg.author)) {
+      return true
+    }
+
     if (this.adminOnly) {
       return msg.member.hasPermission('MANAGE_GUILD') || !!msg.member.roles.find('name', 'Votum Admin')
     } else if (council.councilorRole != null) {
