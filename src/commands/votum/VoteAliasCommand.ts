@@ -16,6 +16,10 @@ export default class VoteAliasCommand extends Command {
       return msg.reply('You must provide a reason with your vote.')
     }
 
+    if (args.reason.length > 2000) {
+      return msg.reply('Your reason is too long. The maximum length is 2000 characters.')
+    }
+
     const motion = this.council.currentMotion
 
     const voteStatus = motion.castVote({

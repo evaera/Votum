@@ -33,6 +33,10 @@ interface EmbedField {
   inline?: boolean
 }
 
+function getEmbedLength (embed: any): number {
+  return JSON.stringify(embed).length
+}
+
 export default class Motion {
   public council: Council
   private data: MotionData
@@ -106,9 +110,11 @@ export default class Motion {
       title = 'Motion Failed'
     }
 
-    return (channel || this.council.channel).send(typeof text !== 'undefined' ? (text === true ? this.council.mentionString : text) : '', { embed: {
+    const votes = text === true ? '' : '\n\n' + this.getVotesAsEmoji()
+
+    let embeds: any[] = [{
       title,
-      description: this.data.text + (text === true ? '' : '\n\n' + this.getVotesAsEmoji()),
+      description: this.data.text.substring(0, 2000 - votes.length) + votes,
       author: {
         name: this.data.authorName,
         icon_url: author ? author.displayAvatarURL() : undefined
@@ -118,7 +124,30 @@ export default class Motion {
       footer: {
         text: this.getVoteHint()
       }
-    }})
+    }]
+
+    const isInvalid = (embed: any, extra = 0) => (embed.fields.length > 25 || getEmbedLength(embed) + extra >= 6000)
+
+    let currentIndex = 1
+    while (isInvalid(embeds[0])) {
+      const field = embeds[0].fields.pop()
+
+      if (embeds[currentIndex] != null && isInvalid(embeds[currentIndex], getEmbedLength(field))) {
+        currentIndex++
+      }
+
+      if (embeds[currentIndex] == null) {
+        embeds[currentIndex] = {
+          title: `${title} (cont.)`,
+          color: embeds[0].color,
+          fields: []
+        }
+      }
+
+      embeds[currentIndex].fields.push(field)
+    }
+
+    return embeds.map(embed => (channel || this.council.channel).send(typeof text !== 'undefined' ? (text === true ? this.council.mentionString : text) : '', { embed }))[0]
   }
 
   public castVote (newVote: MotionVote): CastVoteStatus {
