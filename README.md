@@ -42,6 +42,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!no \| nay \| negative \| nope \| nein <reason>` | Vote no with a mandatory reason.
 | `!abstain [reason]` | Abstain from voting with an optional reason.
 | `!lazyvoters` | Mentions any council members who haven't voted on the current motion yet.
+| `!archive [range]` | Allows you to view past motions. Provide a range of numbers to view a summary, or provide a single number to view a motion.
 
 ## Voting
 
@@ -81,5 +82,5 @@ Contributions and suggestions are welcome.
 - [x] Stats command
 - [ ] Multiple majority types (2/3rd, 4/5th, configurable)
 - [ ] Configurable override to not end motions early when they reach majority.
-- [ ] A command to show historical motion history
+- [x] A command to show historical motion history
 - [ ] Update to support sharding

@@ -79,6 +79,10 @@ export default class Motion {
     return this.data.createdAt
   }
 
+  public get text (): string {
+    return this.data.text
+  }
+
   public get resolution (): MotionResolution {
     return this.data.resolution
   }
