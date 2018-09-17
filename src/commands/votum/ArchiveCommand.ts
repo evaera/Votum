@@ -3,7 +3,7 @@ import { CommandMessage, CommandoClient } from 'discord.js-commando'
 import { MotionResolution } from '../../Motion'
 import Command from '../Command'
 
-const removeFormatting = (text: string) => text.replace(/(\*|_|~)/g, '').replace(/(<@.*?>)/g, '')
+const removeFormatting = (text: string) => text.replace(/(\*|_|~|\n)/g, '').replace(/(<@.*?>)/g, '')
 
 export default class ArchiveCommand extends Command {
   constructor (client: CommandoClient) {
