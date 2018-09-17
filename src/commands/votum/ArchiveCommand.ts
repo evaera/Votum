@@ -3,6 +3,8 @@ import { CommandMessage, CommandoClient } from 'discord.js-commando'
 import { MotionResolution } from '../../Motion'
 import Command from '../Command'
 
+const removeFormatting = (text: string) => text.replace(/(\*|_|~)/g, '').replace(/(<@.*?>)/g, '')
+
 export default class ArchiveCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
@@ -58,7 +60,13 @@ export default class ArchiveCommand extends Command {
 
       for (let i = range[0]; i <= range[1]; i++) {
         const motion = this.council.getMotion(i - 1)
-        summaries.push(`**#${i}** ${MotionResolution[motion.resolution]} | ${motion.text.substring(0, 45)}`)
+        summaries.push(`**#${i}** ${MotionResolution[motion.resolution]} | ${removeFormatting(motion.text).substring(0, 45)}`)
+
+        if (summaries.join('\n').length > 1900) {
+          summaries.pop()
+          summaries.push('**Remaining results have been truncated, please specify a smaller range.**')
+          break
+        }
       }
 
       return msg.reply({ embed: {
