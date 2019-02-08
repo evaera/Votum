@@ -16,6 +16,6 @@ export default class PingInactiveCommand extends Command {
       return msg.reply('There is no motion active.')
     }
 
-    return msg.say('These councilors still need to vote:\n\n' + this.council.currentMotion.getRemainingVoters().array().join(' '))
+    return msg.reply('These councilors still need to vote:\n\n' + this.council.currentMotion.getRemainingVoters().array().join(' '))
   }
 }
