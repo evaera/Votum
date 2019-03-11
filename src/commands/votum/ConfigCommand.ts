@@ -9,6 +9,16 @@ interface ConfigArguments {
   value: string
 }
 
+const makeDisplay = (displayer?: (value: any) => string) => (value: any) => {
+  if (value === undefined || value === null) {
+    return 'None'
+  } else if (displayer) {
+    return displayer(value)
+  } else {
+    return value.toString()
+  }
+}
+
 export default class ConfigCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
@@ -54,7 +64,7 @@ export default class ConfigCommand extends Command {
     }
 
     const serializer = ConfigurableCouncilDataSerializers[key]
-    const display = serializer.display || Object.prototype.toString
+    const display = makeDisplay(serializer.display)
 
     if (args.value.length === 0) {
       return msg.reply(response(
