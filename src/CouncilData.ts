@@ -60,9 +60,10 @@ if (defaultConfigurableData.isLeft()) {
   throw new Error('Invalid default values')
 }
 
-export const DefaultCouncilData: CouncilData = Object.assign({
+export const DefaultCouncilData: CouncilData = {
   enabled: false,
   name: 'Council',
   userCooldowns: {},
-  motions: []
-}, defaultConfigurableData.value)
+  motions: [],
+  ...defaultConfigurableData.value
+}

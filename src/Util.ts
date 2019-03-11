@@ -40,10 +40,11 @@ export function parseType (
   value: string,
   info: Partial<ArgumentInfo>
 ) {
-  const collector = new ArgumentCollector(client, [Object.assign({
+  const collector = new ArgumentCollector(client, [{
     key: 'value',
-    prompt: 'value'
-  }, info)])
+    prompt: 'value',
+    ...info
+  }])
 
   return collector.obtain(message, [value], 0)
 }
