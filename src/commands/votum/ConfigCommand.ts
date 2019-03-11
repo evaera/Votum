@@ -13,6 +13,7 @@ export default class ConfigCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
       name: 'config',
+      aliases: ['votumconfig', 'cfg', 'vconfig', 'vcfg'],
       description: 'Designates a specific role for councilors.',
       adminOnly: true,
 
@@ -42,7 +43,7 @@ export default class ConfigCommand extends Command {
       args.value === '$remove'
       && key in getProps(OptionalCouncilData)
     ) {
-      this.council.configureKey(
+      this.council.setConfig(
         key,
         getDefaultValue(key, OptionalCouncilData)
       )
@@ -64,7 +65,7 @@ export default class ConfigCommand extends Command {
       const value = (result.values as any).value as Object
       const serializedValue = serializer.serialize(value)
 
-      this.council.configureKey(
+      this.council.setConfig(
         key,
         serializedValue
       )
