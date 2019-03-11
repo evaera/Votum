@@ -41,36 +41,24 @@ export default class Council {
     return this.data.announceChannel
   }
 
-  public set announceChannel (channelId: string | undefined) {
-    this.data.announceChannel = channelId
-  }
-
   public get councilorRole (): Snowflake | undefined {
     return this.data.councilorRole
-  }
-
-  public set councilorRole (role: Snowflake | undefined) {
-    this.data.councilorRole = role
   }
 
   public get userCooldown (): number {
     return this.data.userCooldown
   }
 
-  public set userCooldown (role: number) {
-    this.data.userCooldown = role
-  }
-
   public get motionExpiration (): number {
     return this.data.motionExpiration
   }
 
-  public set motionExpiration (role: number) {
-    this.data.motionExpiration = role
+  public setConfig<T extends keyof CouncilData> (key: T, value: CouncilData[T]) {
+    this.data[key] = value
   }
 
-  public configureKey<T extends keyof CouncilData> (key: T, value: CouncilData[T]) {
-    this.data[key] = value
+  public getConfig<T extends keyof CouncilData> (key: T): CouncilData[T] {
+    return this.data[key]
   }
 
   public get mentionString () {
