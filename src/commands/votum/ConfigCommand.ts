@@ -48,8 +48,8 @@ export default class ConfigCommand extends Command {
     if (args.key.length === 0) {
       return msg.reply(response(
         ResponseType.Neutral,
-        `Available configuration points are: ${
-          Object.keys(getProps(ConfigurableCouncilData)).map(n => `~${n}~`).join(', ')
+        `Available configuration points are:\n${
+          Object.keys(getProps(ConfigurableCouncilData)).map(n => `~${n}~`).join(',\n ')
         }.`
       ))
     }
