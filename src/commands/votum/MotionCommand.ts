@@ -48,6 +48,10 @@ export default class MotionCommand extends Command {
       return msg.reply('There is no motion active.')
     }
 
+    if (this.council.getConfig('councilorMotionDisable')) {
+      return msg.reply('Creating motions is disabled in this council.')
+    }
+
     if (args.text.length > 2000) {
       return msg.reply('Your motion is too long. The maximum length is 2000 characters.')
     }

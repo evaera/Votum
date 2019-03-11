@@ -1,11 +1,11 @@
-import { Snowflake } from 'discord.js'
-import { MotionData } from './Motion'
-import * as t from 'io-ts'
-import { withDefault } from './Util'
-import { ArgumentInfo } from 'discord.js-commando'
+import { ArgumentInfo } from 'discord.js-commando';
+import * as t from 'io-ts';
+import { MotionData } from './Motion';
+import { withDefault } from './Util';
 
 const OptionalConfigurableCouncilData = t.partial({
   councilorRole: t.string
+  councilorMotionDisable: t.boolean
 })
 
 const OptionalDefaultConfigurableCouncilData = t.type({
@@ -53,13 +53,15 @@ export const ConfigurableCouncilDataSerializers: {
   councilorRole: {
     type: 'role',
     serialize: getId
+  councilorMotionDisable: {
+    type: 'boolean',
+    serialize: t.identity
   }
 }
 
 interface StaticCouncilData {
   enabled: boolean,
   name: string,
-  announceChannel?: Snowflake,
   userCooldowns: { [index: string]: number },
   motions: MotionData[]
 }
