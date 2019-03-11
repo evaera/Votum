@@ -1,6 +1,6 @@
-import * as Commando from 'discord.js-commando'
 import * as Discord from 'discord.js'
-import * as Commands from './commands'
+import * as Commando from 'discord.js-commando'
+import * as path from 'path'
 import Command from './commands/Command'
 import Council from './Council'
 
@@ -64,7 +64,8 @@ class Votum {
         prefix: false,
         help: true
       })
-      .registerCommands(Object.values(Commands))
+      .registerCommandsIn(path.join(__dirname, './commands/votum'))
+      .registerTypesIn(path.join(__dirname, './types'))
 
     this.bot.dispatcher.addInhibitor(msg => {
       const council = this.getCouncil(msg.channel.id)

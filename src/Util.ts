@@ -46,7 +46,7 @@ export async function parseType (
     ...info
   }])
 
-  const result = await collector.obtain(message, [value], 0)
+  const result = await collector.obtain(message, [value], 5)
 
   if ((result.values as object | null) === null) {
     return null

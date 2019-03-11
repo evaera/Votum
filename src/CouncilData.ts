@@ -1,12 +1,36 @@
-import { ArgumentInfo } from 'discord.js-commando';
-import * as t from 'io-ts';
-import { MotionData } from './Motion';
-import { withDefault } from './Util';
+import { ArgumentInfo } from 'discord.js-commando'
+import * as t from 'io-ts'
+import { MotionData } from './Motion'
+import { withDefault } from './Util'
 
 const OptionalConfigurableCouncilData = t.partial({
-  councilorRole: t.string
+  councilorRole: t.string,
+  announceChannel: t.string,
+
+  onPassedAnnounce: t.string,
+  onKilledAnnounce: t.string,
+  onFailedAnnounce: t.string,
+
+  onFinishActions: t.unknown,
+
   councilorMotionDisable: t.boolean
 })
+
+export interface OnFinishActions {
+  failed?: OnFinishAction[]
+  killed?: OnFinishAction[]
+  passed?: OnFinishAction[]
+}
+
+export interface OnFinishAction {
+  action: 'forward'
+  atMajority: number
+  /**
+   * Options string which overrides the existing motion options
+   */
+  options?: string
+  to: string
+}
 
 const OptionalDefaultConfigurableCouncilData = t.type({
   userCooldown: withDefault(t.number, 0),
@@ -53,6 +77,28 @@ export const ConfigurableCouncilDataSerializers: {
   councilorRole: {
     type: 'role',
     serialize: getId
+  },
+  announceChannel: {
+    type: 'channel',
+    serialize: getId
+  },
+  onPassedAnnounce: {
+    type: 'channel',
+    serialize: getId
+  },
+  onFailedAnnounce: {
+    type: 'channel',
+    serialize: getId
+  },
+  onKilledAnnounce: {
+    type: 'channel',
+    serialize: getId
+  },
+  onFinishActions: {
+    type: 'finish-action',
+    serialize: t.identity,
+    display: x => `~~json\n${JSON.stringify(x, undefined, 1)}~~`
+  },
   councilorMotionDisable: {
     type: 'boolean',
     serialize: t.identity

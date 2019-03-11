@@ -1,0 +1,81 @@
+{
+  "definitions": {
+    "action": {
+      "type": "array",
+      "title": "Action",
+      "items": {
+        "type": "object",
+        "title": "Action",
+        "required": [
+          "atMajority",
+          "action",
+          "to"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "atMajority": {
+            "type": "number",
+            "title": "At this majority:",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1,
+            "examples": [
+              0.5
+            ]
+          },
+          "action": {
+            "type": "string",
+            "title": "Action",
+            "default": "",
+            "examples": [
+              "forward"
+            ],
+            "enum": [
+              "forward"
+            ]
+          },
+          "to": {
+            "type": "string",
+            "title": "Council ID",
+            "default": "",
+            "examples": [
+              "000232302323032300"
+            ],
+            "pattern": "^([0-9]+)$"
+          },
+          "options": {
+            "type": "string",
+            "title": "Options string",
+            "description": "Options string which overrides the existing motion options",
+            "examples": [
+              "--majority 2/3"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Votum Motion Actions",
+  "additionalProperties": false,
+  "anyOf": [
+    { "required": ["passed"] },
+    { "required": ["failed"] },
+    { "required": ["killed"] }
+  ],
+  "properties": {
+    "passed": {
+      "$ref": "#/definitions/action",
+      "title": "Passed"
+    },
+    "failed": {
+      "$ref": "#/definitions/action",
+      "title": "Failed"
+    },
+    "killed": {
+      "$ref": "#/definitions/action",
+      "title": "Killed"
+    }
+  }
+}
