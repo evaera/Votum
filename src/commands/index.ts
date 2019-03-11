@@ -1,4 +1,5 @@
 export { default as Yes } from './votum/YesCommand'
+export { default as Config } from './votum/ConfigCommand'
 export { default as No } from './votum/NoCommand'
 export { default as Abstain } from './votum/AbstainCommand'
 export { default as Motion } from './votum/MotionCommand'

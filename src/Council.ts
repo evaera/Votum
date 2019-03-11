@@ -1,29 +1,12 @@
 import { Collection, GuildMember, Snowflake, TextChannel } from 'discord.js'
 import * as fs from 'fs'
-import * as path from 'path'
-import Motion, { MotionData } from './Motion'
 import * as onChange from 'on-change'
-
-interface CouncilData {
-  enabled: boolean,
-  name: string,
-  announceChannel?: Snowflake,
-  councilorRole?: Snowflake,
-  userCooldown: number,
-  userCooldowns: { [index: string]: number },
-  motionExpiration: number,
-  motions: MotionData[]
-}
+import * as path from 'path'
+import { CouncilData, DefaultCouncilData } from './CouncilData'
+import Motion, { MotionData } from './Motion'
 
 export default class Council {
-  private static defaultData: CouncilData = {
-    enabled: false,
-    name: 'Council',
-    userCooldown: 0,
-    motionExpiration: 0,
-    userCooldowns: {},
-    motions: []
-  }
+  private static defaultData = DefaultCouncilData
 
   public id: Snowflake
   public channel: TextChannel
@@ -84,6 +67,10 @@ export default class Council {
 
   public set motionExpiration (role: number) {
     this.data.motionExpiration = role
+  }
+
+  public configureKey<T extends keyof CouncilData> (key: T, value: CouncilData[T]) {
+    this.data[key] = value
   }
 
   public get mentionString () {
