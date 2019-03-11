@@ -34,11 +34,11 @@ export function getDefaultValue (name: string, type: t.HasProps | t.ExactType<t.
   return getProps(type)[name].decode(undefined).getOrElse(undefined)
 }
 
-export function parseType (
+export async function parseType (
   client: CommandoClient,
   message: CommandMessage,
   value: string,
-  info: Partial<ArgumentInfo>
+  info: Partial<ArgumentInfo> & { transform? (value: any): any }
 ) {
   const collector = new ArgumentCollector(client, [{
     key: 'value',
@@ -46,7 +46,19 @@ export function parseType (
     ...info
   }])
 
-  return collector.obtain(message, [value], 0)
+  const result = await collector.obtain(message, [value], 0)
+
+  if ((result.values as object | null) === null) {
+    return null
+  }
+
+  let parsedValue = (result.values as any).value as unknown
+
+  if (info.transform) {
+    parsedValue = info.transform(parsedValue)
+  }
+
+  return parsedValue as Object
 }
 
 export enum ResponseType {

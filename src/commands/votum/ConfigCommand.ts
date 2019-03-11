@@ -5,7 +5,7 @@ import { getDefaultValue, getProps, parseType, ResponseType, response } from '..
 import Command from '../Command'
 
 interface ConfigArguments {
-  key: keyof ConfigurableCouncilData
+  key: string
   value: string
 }
 
@@ -21,22 +21,46 @@ export default class ConfigCommand extends Command {
         {
           key: 'key',
           prompt: 'Which configuration point would you like to change?',
-          type: 'string'
+          type: 'string',
+          default: ''
         },
         {
           key: 'value',
           prompt: 'What value would you like to set this configuration point to?',
-          type: 'string'
+          type: 'string',
+          default: ''
         }
       ]
     })
   }
 
   async execute (msg: CommandMessage, args: ConfigArguments): Promise<Message | Message[]> {
+    if (args.key.length === 0) {
+      return msg.reply(response(
+        ResponseType.Neutral,
+        `Available configuration points are: ${
+          Object.keys(getProps(ConfigurableCouncilData)).map(n => `~${n}~`).join(', ')
+        }.`
+      ))
+    }
+
     const key = args.key.replace(/\.([a-z0-9])/g, (_, l) => l.toUpperCase()) as keyof ConfigurableCouncilData
 
     if (!(key in getProps(ConfigurableCouncilData))) {
-      return msg.reply(`:grey_question: \`${key}\` is not a valid configuration point.`)
+      return msg.reply(response(
+        ResponseType.Bad,
+        `:x: \`${key}\` is not a valid configuration point.`
+      ))
+    }
+
+    const serializer = ConfigurableCouncilDataSerializers[key]
+    const display = serializer.display || Object.prototype.toString
+
+    if (args.value.length === 0) {
+      return msg.reply(response(
+        ResponseType.Neutral,
+        `Configuration point ${args.key} is currently set to ~${display(this.council.getConfig(key))}~.`
+      ))
     }
 
     if (
@@ -53,16 +77,14 @@ export default class ConfigCommand extends Command {
       ))
     }
 
-    const serializer = ConfigurableCouncilDataSerializers[key]
-    const result = await parseType(
+    const value = await parseType(
       this.client,
       msg,
       args.value,
       serializer
     )
 
-    if ((result.values as object | null) !== null) {
-      const value = (result.values as any).value as Object
+    if (value !== null) {
       const serializedValue = serializer.serialize(value)
 
       this.council.setConfig(
@@ -72,7 +94,7 @@ export default class ConfigCommand extends Command {
 
       return msg.reply(response(
         ResponseType.Good,
-        `Set configuration point ~${key}~ to ${value.toString()}`
+        `Set configuration point ~${key}~ to ${display(value)}`
       ))
     } else {
       return msg.reply(response(

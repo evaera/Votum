@@ -5,7 +5,7 @@ import { withDefault } from './Util'
 import { ArgumentInfo } from 'discord.js-commando'
 
 const OptionalConfigurableCouncilData = t.partial({
-
+  councilorRole: t.string
 })
 
 const OptionalDefaultConfigurableCouncilData = t.type({
@@ -25,21 +25,34 @@ export type ConfigurableCouncilData = t.TypeOf<typeof ConfigurableCouncilData>
 
 interface Serializer<T> extends Partial<ArgumentInfo> {
   serialize (value: any): T
+  transform? (value: any): any
+  display? (value: any): any
   type: string
 }
 
+const hoursTransformSerialize = (n: number) => n * 3600000
+const hoursTransformDisplay = (n: number) => n / 3600000
+const getId = (e: { id: string }) => e.id
 export const ConfigurableCouncilDataSerializers: {
-  [K in keyof ConfigurableCouncilData]: Serializer<
+  [K in keyof Required<ConfigurableCouncilData>]: Serializer<
     ConfigurableCouncilData[K]
   >
 } = {
   userCooldown: {
     type: 'integer',
-    serialize: t.identity
+    serialize: t.identity,
+    transform: hoursTransformSerialize,
+    display: hoursTransformDisplay
   },
   motionExpiration: {
     type: 'integer',
-    serialize: t.identity
+    serialize: t.identity,
+    transform: hoursTransformSerialize,
+    display: hoursTransformDisplay
+  },
+  councilorRole: {
+    type: 'role',
+    serialize: getId
   }
 }
 
@@ -47,7 +60,6 @@ interface StaticCouncilData {
   enabled: boolean,
   name: string,
   announceChannel?: Snowflake,
-  councilorRole?: Snowflake,
   userCooldowns: { [index: string]: number },
   motions: MotionData[]
 }
