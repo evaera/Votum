@@ -1,9 +1,12 @@
 import { Snowflake, Message, TextChannel, GuildMember, Collection } from 'discord.js'
 import Council from './Council'
 import Votum from './Votum'
-import { MotionData, MotionVote } from './MotionData'
+import { MotionData, MotionVote, MotionOptions, MotionMetaOptions } from './MotionData'
+import * as minimist from 'minimist'
+import * as t from 'io-ts'
+import { Either } from 'fp-ts/lib/Either'
 
-export enum MotionVoteType { Majority, Unanimous }
+export enum LegacyMotionVoteType { Majority, Unanimous }
 export enum MotionResolution { Unresolved, Killed, Passed, Failed }
 export enum CastVoteStatus { New, Changed, Failed }
 
@@ -23,12 +26,29 @@ export default class Motion {
   private data: MotionData
   private votesToPass: number
 
+  static parseMotionOptions (input: string): Either<t.Errors, [string, MotionOptions]> {
+    const args = minimist<MotionMetaOptions & { [K in keyof MotionOptions]: string }>(input.split(' '), {
+      stopEarly: true,
+      boolean: ['unanimous'],
+      alias: {
+        u: 'unanimous',
+        m: 'majority'
+      }
+    })
+
+    if (args.unanimous) {
+      args.majority = '100%'
+    }
+
+    return MotionOptions.decode(args).map((options): [string, MotionOptions] => [args._.join(' '), options])
+  }
+
   constructor (motionIndex: number, motionData: MotionData, council: Council) {
     this.data = motionData
     this.council = council
     this.motionIndex = motionIndex
 
-    if (this.data.voteType === MotionVoteType.Majority) {
+    if (this.data.voteType === LegacyMotionVoteType.Majority) {
       this.votesToPass = Math.ceil(this.council.size / 2)
     } else {
       this.votesToPass = this.council.size
@@ -81,7 +101,7 @@ export default class Motion {
     }
 
     let type = ''
-    if (this.data.voteType === MotionVoteType.Unanimous) {
+    if (this.data.voteType === LegacyMotionVoteType.Unanimous) {
       type = ' (unanimous)'
     }
 
@@ -217,7 +237,7 @@ export default class Motion {
 
     if (votes.yes >= votes.toPass) {
       this.resolve(MotionResolution.Passed)
-    } else if (this.data.voteType === MotionVoteType.Unanimous && votes.no > 0) {
+    } else if (this.data.voteType === LegacyMotionVoteType.Unanimous && votes.no > 0) {
       this.resolve(MotionResolution.Failed)
     } else if (votes.no >= votes.toPass || votes.toPass === 0) {
       this.resolve(MotionResolution.Failed)
@@ -226,7 +246,7 @@ export default class Motion {
 
   private getVoteHint (): string {
     if (this.data.active === false) {
-      return `Results final.` + (this.data.voteType === MotionVoteType.Unanimous ? ' (Unanimous vote was required)' : '') + (this.data.didExpire ? ' (Motion expired.)' : '')
+      return `Results final.` + (this.data.voteType === LegacyMotionVoteType.Unanimous ? ' (Unanimous vote was required)' : '') + (this.data.didExpire ? ' (Motion expired.)' : '')
     }
 
     const votes = this.getVotes()

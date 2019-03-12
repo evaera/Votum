@@ -1,7 +1,9 @@
 import { CommandoClient, CommandMessage } from 'discord.js-commando'
 import { Message } from 'discord.js'
 import Command from '../Command'
-import { MotionVoteType, MotionResolution } from '../../Motion'
+import Motion, { LegacyMotionVoteType, MotionResolution } from '../../Motion'
+import { response, ResponseType } from '../../Util'
+import { PathReporter } from 'io-ts/lib/PathReporter'
 
 export default class MotionCommand extends Command {
   constructor (client: CommandoClient) {
@@ -60,16 +62,21 @@ export default class MotionCommand extends Command {
       return msg.reply(`You must wait ${+(this.council.userCooldown / 3600000).toFixed(2)} hours between motions. (${+(this.council.getUserCooldown(msg.author.id) / 3600000).toFixed(2)} hours left)`)
     }
 
-    let text: string[] = args.text.split(' ')
-    let voteType = MotionVoteType.Majority
+    let voteType = LegacyMotionVoteType.Majority
 
-    if (text[0] === '-u') {
-      text.shift()
-      voteType = MotionVoteType.Unanimous
+    const result = Motion.parseMotionOptions(args.text)
+
+    if (result.isLeft()) {
+      return msg.reply(response(
+        ResponseType.Bad,
+        PathReporter.report(result).join('\n')
+      ))
     }
 
+    const [text, options] = result.value
+
     const motion = this.council.createMotion({
-      text: text.join(' '),
+      text,
       authorId: msg.author.id,
       authorName: msg.member.displayName,
       createdAt: Date.now(),
@@ -77,7 +84,8 @@ export default class MotionCommand extends Command {
       active: true,
       resolution: MotionResolution.Unresolved,
       didExpire: false,
-      votes: []
+      votes: [],
+      options
     })
 
     return motion.postMessage(true)

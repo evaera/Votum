@@ -1,6 +1,6 @@
 import { Snowflake } from 'discord.js'
 import * as t from 'io-ts'
-import { MotionResolution, MotionVoteType } from './Motion'
+import { MotionResolution, LegacyMotionVoteType } from './Motion'
 import { betweenRange, ExtractRight } from './Util'
 
 export interface MotionData {
@@ -9,11 +9,12 @@ export interface MotionData {
   active: boolean
   resolution: MotionResolution
   text: string
-  voteType: MotionVoteType
+  voteType?: LegacyMotionVoteType
   createdAt: number
   deletedAt?: number
   didExpire: boolean
   votes: MotionVote[]
+  options: MotionOptions
 }
 
 export interface MotionVote {
@@ -57,9 +58,11 @@ export const MotionMajorityType = new t.Type(
   t.identity
 ).pipe(betweenRange(0, 1))
 
-export const MotionOptions = t.partial({
-  unanimous: t.boolean,
+export const MotionOptions = t.exact(t.partial({
   majority: MotionMajorityType
-})
-
+}))
 export type MotionOptions = t.TypeOf<typeof MotionOptions>
+
+export interface MotionMetaOptions {
+  unanimous?: boolean
+}

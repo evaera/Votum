@@ -4,7 +4,7 @@ import * as onChange from 'on-change'
 import * as path from 'path'
 import { CouncilData, DefaultCouncilData } from './CouncilData'
 import Motion from './Motion'
-import { MotionData } from "./MotionData";
+import { MotionData } from './MotionData';
 
 export default class Council {
   private static defaultData = DefaultCouncilData
@@ -144,7 +144,7 @@ export default class Council {
 
     this.data = onChange(data, () => {
       setTimeout(() => {
-        fs.writeFile(this.dataPath, JSON.stringify(this.data), () => undefined)
+        fs.writeFile(this.dataPath, JSON.stringify(this.data, undefined, 2), () => undefined)
       }, 0)
     }) as CouncilData
   }
