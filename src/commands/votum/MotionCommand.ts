@@ -86,6 +86,10 @@ export default class MotionCommand extends Command {
 
     const motionAlreadyExists = this.council.currentMotion
 
+    if (this.council.getConfig('userCooldownKill')) {
+      this.council.setUserCooldown(msg.author.id, Date.now())
+    }
+
     const motion = this.council.createMotion({
       text,
       authorId: msg.author.id,

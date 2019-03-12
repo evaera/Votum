@@ -223,7 +223,7 @@ export default class Motion {
 
     if (
       (resolution === MotionResolution.Failed || resolution === MotionResolution.Passed)
-      || this.council.getConfig('userCooldownKill')
+      && !this.council.getConfig('userCooldownKill')
     ) {
       this.council.setUserCooldown(this.data.authorId, this.data.createdAt)
 
