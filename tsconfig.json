@@ -9,6 +9,7 @@
 		"sourceMap": true,
 		"outDir": "dist",
 		"resolveJsonModule": true,
+		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"lib": [
 			"es2015",

@@ -1,6 +1,6 @@
 import { ArgumentType, CommandoClient } from 'discord.js-commando'
 import actionSchema = require('../schemas/action.json')
-import * as Ajv from 'ajv'
+import Ajv from 'ajv'
 
 const validateActionSchema = new Ajv().compile(actionSchema)
 

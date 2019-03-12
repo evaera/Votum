@@ -1,14 +1,17 @@
-import { Snowflake, Message, TextChannel, GuildMember, Collection } from 'discord.js'
-import Council from './Council'
-import Votum from './Votum'
-import { MotionData, MotionVote, MotionOptions, MotionMetaOptions } from './MotionData'
-import * as minimist from 'minimist'
-import * as t from 'io-ts'
+import { Collection, GuildMember, Message, Snowflake, TextChannel } from 'discord.js'
 import { Either } from 'fp-ts/lib/Either'
+import * as t from 'io-ts'
+import minimist from 'minimist'
+import Council from './Council'
+import { MotionData, MotionMetaOptions, MotionOptions, MotionVote } from './MotionData'
+import Votum from './Votum'
+import num2fraction from 'num2fraction'
 
 export enum LegacyMotionVoteType { Majority, Unanimous }
 export enum MotionResolution { Unresolved, Killed, Passed, Failed }
 export enum CastVoteStatus { New, Changed, Failed }
+
+const DEFAULT_MAJORITY = 0.5
 
 interface EmbedField {
   name: string,
@@ -87,6 +90,18 @@ export default class Motion {
     return this.data.resolution
   }
 
+  public get requiredMajority (): number {
+    return this.data.options.majority || this.council.getConfig('majorityDefault') || DEFAULT_MAJORITY
+  }
+
+  public getReadableMajority (): string {
+    if (this.requiredMajority === 1) {
+      return 'Unanimous'
+    }
+
+    return num2fraction(this.requiredMajority)
+  }
+
   public async postMessage (text?: string | true, channel?: TextChannel): Promise<Message | Message[]> {
     let author
 
@@ -133,6 +148,9 @@ export default class Motion {
       fields: this.getVotesAsFields(),
       footer: {
         text: this.getVoteHint()
+      },
+      thumbnail: {
+        url: `http://assets.imgix.net/~text?txt=${encodeURIComponent(this.getReadableMajority())}&txtclr=3498db&txtsize=20&h=50&txtfont=Georgia`
       }
     }]
 

@@ -7,9 +7,11 @@
     "fp-ts": "^1.14.4",
     "io-ts": "^1.8.2",
     "minimist": "^1.2.0",
+    "num2fraction": "^1.2.2",
     "on-change": "^0.1.0"
   },
   "devDependencies": {
+    "@types/minimist": "^1.2.0",
     "@types/node": "^10.12.30",
     "discord.js-typings": "https://github.com/discordjs/discord.js-typings.git#376000ebb8ee6f7287d6be387cae45d24b74bfa7",
     "tslint": "^5.13.1",

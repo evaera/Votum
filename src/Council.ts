@@ -1,10 +1,10 @@
 import { Collection, GuildMember, Snowflake, TextChannel } from 'discord.js'
 import * as fs from 'fs'
-import * as onChange from 'on-change'
+import onChange from 'on-change'
 import * as path from 'path'
 import { CouncilData, DefaultCouncilData } from './CouncilData'
 import Motion from './Motion'
-import { MotionData } from './MotionData';
+import { MotionData } from './MotionData'
 
 export default class Council {
   private static defaultData = DefaultCouncilData
