@@ -232,6 +232,14 @@ export default class Motion {
       }
     }
 
+    if (resolution === MotionResolution.Passed && this.council.getConfig('onPassedAnnounce')) {
+      this.postMessage('', this.council.channel.guild.channels.get(this.council.getConfig('onPassedAnnounce')!) as TextChannel)
+    } else if (resolution === MotionResolution.Failed && this.council.getConfig('onFailedAnnounce')) {
+      this.postMessage('', this.council.channel.guild.channels.get(this.council.getConfig('onFailedAnnounce')!) as TextChannel)
+    } else if (resolution === MotionResolution.Killed && this.council.getConfig('onKilledAnnounce')) {
+      this.postMessage('', this.council.channel.guild.channels.get(this.council.getConfig('onKilledAnnounce')!) as TextChannel)
+    }
+
     const newCurrentMotion = this.council.currentMotion
     if (newCurrentMotion) {
       setTimeout(() => newCurrentMotion.postMessage(true).then(() => undefined).catch(e => {
