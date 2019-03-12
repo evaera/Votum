@@ -119,7 +119,7 @@ export async function forwardMotion (motion: Motion, targetCouncilId: string, op
     }
   }
 
-  motionData.votes = []
+  motionData.votes.forEach((vote: any) => vote.state = undefined)
   motionData.resolution = MotionResolution.Unresolved
   motionData.active = true
   motionData.didExpire = false

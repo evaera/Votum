@@ -20,7 +20,7 @@ export interface MotionData {
 export interface MotionVote {
   authorId: Snowflake,
   authorName: string,
-  state: 1 | 0 | -1,
+  state?: 1 | 0 | -1,
   name: string,
   reason?: string
 }

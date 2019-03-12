@@ -205,7 +205,7 @@ export default class Motion {
     }
 
     for (const vote of this.data.votes) {
-      votes[vote.state]++
+      if (vote.state) votes[vote.state]++
     }
 
     return {
