@@ -1,5 +1,8 @@
 import { ArgumentCollector, CommandMessage, CommandoClient, ArgumentInfo } from 'discord.js-commando'
 import * as t from 'io-ts'
+import { Either } from 'fp-ts/lib/Either'
+
+export type ExtractRight<T> = T extends Either<infer L, infer R> ? R : never
 
 export function withDefault<T extends t.Any> (type: T, defaultValue: t.TypeOf<T>): t.Type<t.TypeOf<T>, t.TypeOf<T>> {
   return new t.Type(
@@ -7,6 +10,18 @@ export function withDefault<T extends t.Any> (type: T, defaultValue: t.TypeOf<T>
     type.is,
     (v, c) => type.validate(v != null ? v : defaultValue, c),
     type.encode
+  )
+}
+
+export function betweenRange (min: number, max: number) {
+  return new t.Type(
+    `range(${min}, ${max})`,
+    t.number.is,
+    (u, c) =>
+      t.number.validate(u, c).chain(s =>
+        s >= min && s <= max ? t.success(s) : t.failure(u, c)
+      ),
+    t.identity
   )
 }
 

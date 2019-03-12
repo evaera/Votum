@@ -1,31 +1,11 @@
 import { Snowflake, Message, TextChannel, GuildMember, Collection } from 'discord.js'
 import Council from './Council'
 import Votum from './Votum'
+import { MotionData, MotionVote } from './MotionData'
 
 export enum MotionVoteType { Majority, Unanimous }
 export enum MotionResolution { Unresolved, Killed, Passed, Failed }
 export enum CastVoteStatus { New, Changed, Failed }
-
-export interface MotionVote {
-  authorId: Snowflake,
-  authorName: string,
-  state: 1 | 0 | -1,
-  name: string,
-  reason?: string
-}
-
-export interface MotionData {
-  authorId: Snowflake,
-  authorName: string,
-  active: boolean,
-  resolution: MotionResolution,
-  text: string,
-  voteType: MotionVoteType,
-  createdAt: number,
-  deletedAt?: number,
-  didExpire: boolean,
-  votes: MotionVote[]
-}
 
 interface EmbedField {
   name: string,

@@ -1,6 +1,6 @@
 import { ArgumentInfo } from 'discord.js-commando'
 import * as t from 'io-ts'
-import { MotionData } from './Motion'
+import { MotionData, MotionMajorityType } from './MotionData'
 import { withDefault } from './Util'
 
 const OptionalConfigurableCouncilData = t.partial({
@@ -13,7 +13,8 @@ const OptionalConfigurableCouncilData = t.partial({
 
   onFinishActions: t.unknown,
 
-  councilorMotionDisable: t.boolean
+  councilorMotionDisable: t.boolean,
+  majorityDefault: MotionMajorityType
 })
 
 export interface OnFinishActions {
@@ -24,7 +25,7 @@ export interface OnFinishActions {
 
 export interface OnFinishAction {
   action: 'forward'
-  atMajority: number
+  atMajority?: number
   /**
    * Options string which overrides the existing motion options
    */
@@ -102,6 +103,11 @@ export const ConfigurableCouncilDataSerializers: {
   councilorMotionDisable: {
     type: 'boolean',
     serialize: t.identity
+  },
+  majorityDefault: {
+    type: 'majority-type',
+    serialize: t.identity,
+    display: n => n.toLocaleString('en-us', { style: 'percent' })
   }
 }
 
