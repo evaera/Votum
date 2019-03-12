@@ -40,8 +40,8 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `on.failed.announce` | `channel` | A channel that announces *failed* motions only. | None
 | `councilor.motion.disable` | `boolean` | Whether or not creating new motions is disabled in this council (only accepts forwarded motions) | false
 | `motion.queue` | `boolean` | If enabled, motions can be created when another is active and will be queued, automatically starting when the current motion ends. | false
-| `majority.default` | `number` | The default majority for motions. Fraction or percentage. | 1/2
-| `majority.minimum` | `number` | The minimum majority councilors can create motions with. | 1/2
+| `majority.default` | `majority-type` | The default majority for motions. Fraction or percentage. | 1/2
+| `majority.minimum` | `majority-type` | The minimum majority councilors can create motions with. | 1/2
 | `majority.reached.ends` | `boolean` | Whether or not motions end as soon as majority is reached. Otherwise, all councilors will need to vote. | true
 | `on.finish.actions` | `json` | A set of actions that will take place when a motion resolves. See [Finish Actions](#finish-actions) | None
 
