@@ -43,7 +43,9 @@ export default class MotionCommand extends Command {
         }
       }
 
-      return msg.reply('There is already an active motion.')
+      if (!this.council.getConfig('motionQueue')) {
+        return msg.reply('There is already an active motion.')
+      }
     }
 
     if (args.text === 'kill') {
@@ -94,6 +96,13 @@ export default class MotionCommand extends Command {
       votes: [],
       options
     })
+
+    if (this.council.currentMotion) {
+      return msg.reply(response(
+        ResponseType.Good,
+        'Your motion has been queued and will begin after the current motion.'
+      ))
+    }
 
     return motion.postMessage(true)
   }

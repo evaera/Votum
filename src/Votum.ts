@@ -34,7 +34,7 @@ class Votum {
 
   public getCouncil (id: Discord.Snowflake): Council {
     if (this.councilMap.has(id)) {
-      return this.councilMap.get(id) as Council
+      return this.councilMap.get(id)!
     }
 
     const channel = this.bot.channels.get(id)

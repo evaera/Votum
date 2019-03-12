@@ -14,6 +14,7 @@ const OptionalConfigurableCouncilData = t.partial({
   onFinishActions: t.unknown,
 
   councilorMotionDisable: t.boolean,
+  motionQueue: t.boolean,
 
   majorityDefault: MotionMajorityType
 })
@@ -119,6 +120,10 @@ export const ConfigurableCouncilDataSerializers: {
     serialize: t.identity
   },
   majorityReachedEnds: {
+    type: 'boolean',
+    serialize: t.identity
+  },
+  motionQueue: {
     type: 'boolean',
     serialize: t.identity
   }

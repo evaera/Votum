@@ -90,6 +90,10 @@ export default class Motion {
     return this.data.options.majority || this.council.getConfig('majorityDefault') || DEFAULT_MAJORITY
   }
 
+  public getData () {
+    return this.data
+  }
+
   public getReadableMajority (): string {
     if (this.requiredMajority === 1) {
       return 'Unanimous'
@@ -221,6 +225,13 @@ export default class Motion {
       if (this.council.announceChannel) {
         this.postMessage('', this.council.channel.guild.channels.get(this.council.announceChannel) as TextChannel)
       }
+    }
+
+    const newCurrentMotion = this.council.currentMotion
+    if (newCurrentMotion) {
+      setTimeout(() => newCurrentMotion.postMessage(true).then(() => undefined).catch(e => {
+        throw e
+      }), 2000)
     }
   }
 
