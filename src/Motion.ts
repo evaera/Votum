@@ -249,12 +249,14 @@ export default class Motion {
       }
     }
 
-    if (votes.yes >= votes.toPass) {
-      this.resolve(MotionResolution.Passed)
-    } else if (this.data.voteType === LegacyMotionVoteType.Unanimous && votes.no > 0) {
-      this.resolve(MotionResolution.Failed)
-    } else if (votes.no >= votes.toPass || votes.toPass === 0) {
-      this.resolve(MotionResolution.Failed)
+    if (this.council.getConfig('majorityReachedEnds') || this.data.votes.length === this.council.size) {
+      if (votes.yes >= votes.toPass) {
+        this.resolve(MotionResolution.Passed)
+      } else if (this.data.voteType === LegacyMotionVoteType.Unanimous && votes.no > 0) {
+        this.resolve(MotionResolution.Failed)
+      } else if (votes.no >= votes.toPass || votes.toPass === 0) {
+        this.resolve(MotionResolution.Failed)
+      }
     }
   }
 
@@ -269,6 +271,8 @@ export default class Motion {
       return `The motion is expired, but is tied. The next vote will close the motion.`
     } else if (votes.yes === 0 && votes.no === 0) {
       return `This motion requires ${votes.toPass} vote${votes.toPass === 1 ? '' : 's'} to pass or fail.`
+    } else if ((votes.yes >= votes.no && votes.yes >= votes.toPass) || (votes.no >= votes.yes && votes.no >= votes.toPass)) {
+      return `This motion has reached the required majority, but is being held until all councilors have voted.`
     } else if (votes.yes >= votes.no) {
       return `With ${votes.toPass - votes.yes} more vote${votes.toPass - votes.yes === 1 ? '' : 's'} for this motion, it will pass.`
     } else if (votes.no > votes.yes) {
