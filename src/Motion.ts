@@ -6,6 +6,8 @@ import Council from './Council'
 import { MotionData, MotionMetaOptions, MotionOptions, MotionVote } from './MotionData'
 import Votum from './Votum'
 import num2fraction from 'num2fraction'
+import { forwardMotion } from './Util'
+import { OnFinishAction } from './CouncilData'
 
 export enum LegacyMotionVoteType { Majority, Unanimous }
 export enum MotionResolution { Unresolved, Killed, Passed, Failed }
@@ -236,6 +238,22 @@ export default class Motion {
         throw e
       }), 2000)
     }
+
+    const actions = this.council.getConfig('onFinishActions') as any
+    if (!actions) return
+
+    switch (resolution) {
+      case MotionResolution.Failed:
+        if (actions.failed) this.performFinishActions(actions.failed)
+        break
+      case MotionResolution.Passed:
+        if (actions.passed) this.performFinishActions(actions.passed)
+        break
+      case MotionResolution.Killed:
+        if (actions.killed) this.performFinishActions(actions.killed)
+        break
+    }
+
   }
 
   public getRemainingVoters (): Collection<string, GuildMember> {
@@ -314,5 +332,18 @@ export default class Motion {
     }
 
     return fields
+  }
+
+  private performFinishActions (actions: OnFinishAction[]) {
+    actions = JSON.parse(JSON.stringify(actions))
+    return Promise.all(actions.filter(action =>
+      action.atMajority === undefined
+      || Math.abs(action.atMajority - this.requiredMajority) < 0.01
+    ).map(action => {
+      switch (action.action) {
+        case 'forward':
+          return forwardMotion(this, action.to, action.options)
+      }
+    }))
   }
 }

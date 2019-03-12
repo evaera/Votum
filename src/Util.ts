@@ -1,6 +1,8 @@
 import { ArgumentCollector, CommandMessage, CommandoClient, ArgumentInfo } from 'discord.js-commando'
 import * as t from 'io-ts'
 import { Either } from 'fp-ts/lib/Either'
+import Motion, { MotionResolution } from './Motion'
+import Votum from './Votum'
 
 export type ExtractRight<T> = T extends Either<infer L, infer R> ? R : never
 
@@ -92,5 +94,40 @@ export function response (color: number, description: string, {
       title,
       color
     }
+  }
+}
+
+export async function forwardMotion (motion: Motion, targetCouncilId: string, optionsString?: string) {
+  const targetCouncil = Votum.getCouncil(targetCouncilId)
+
+  if (!targetCouncil.enabled) {
+    return
+  }
+
+  const motionData = JSON.parse(JSON.stringify(motion.getData()))
+
+  if (optionsString) {
+    const ea = Motion.parseMotionOptions(optionsString)
+
+    if (ea.isRight()) {
+      const [, options] = ea.value
+
+      motionData.options = {
+        ...motionData.options,
+        ...options
+      }
+    }
+  }
+
+  motionData.votes = []
+  motionData.resolution = MotionResolution.Unresolved
+  motionData.active = true
+  motionData.didExpire = false
+
+  const existingMotion = targetCouncil.currentMotion
+  const newMotion = targetCouncil.createMotion(motionData)
+
+  if (!existingMotion) {
+    await newMotion.postMessage(true)
   }
 }
