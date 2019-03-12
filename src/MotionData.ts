@@ -14,7 +14,7 @@ export interface MotionData {
   deletedAt?: number
   didExpire: boolean
   votes: MotionVote[]
-  options: MotionOptions
+  options?: MotionOptions
 }
 
 export interface MotionVote {

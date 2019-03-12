@@ -89,6 +89,10 @@ export default class Motion {
   }
 
   public get requiredMajority (): number {
+    if (!this.data.options) {
+      return this.council.getConfig('majorityDefault') || DEFAULT_MAJORITY
+    }
+
     return this.data.options.majority || this.council.getConfig('majorityDefault') || DEFAULT_MAJORITY
   }
 
