@@ -23,7 +23,7 @@ export default class ConfigCommand extends Command {
   constructor (client: CommandoClient) {
     super(client, {
       name: 'config',
-      aliases: ['votumconfig', 'cfg', 'vconfig', 'vcfg'],
+      aliases: ['votumconfig', 'cfg', 'vconfig', 'vcfg', 'councilconfig'],
       description: 'Designates a specific role for councilors.',
       adminOnly: true,
 
