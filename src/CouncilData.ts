@@ -6,6 +6,7 @@ import { withDefault, betweenRange } from './Util'
 const OptionalConfigurableCouncilData = t.partial({
   councilorRole: t.string,
   announceChannel: t.string,
+  userCooldownKill: t.boolean,
 
   onPassedAnnounce: t.string,
   onKilledAnnounce: t.string,
@@ -124,6 +125,10 @@ export const ConfigurableCouncilDataSerializers: {
     serialize: t.identity
   },
   motionQueue: {
+    type: 'boolean',
+    serialize: t.identity
+  },
+  userCooldownKill: {
     type: 'boolean',
     serialize: t.identity
   }

@@ -219,7 +219,10 @@ export default class Motion {
     this.data.resolution = resolution
     this.data.didExpire = this.isExpired
 
-    if (resolution === MotionResolution.Failed || resolution === MotionResolution.Passed) {
+    if (
+      (resolution === MotionResolution.Failed || resolution === MotionResolution.Passed)
+      || this.council.getConfig('userCooldownKill')
+    ) {
       this.council.setUserCooldown(this.data.authorId, this.data.createdAt)
 
       if (this.council.announceChannel) {
