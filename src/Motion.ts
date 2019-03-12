@@ -51,11 +51,7 @@ export default class Motion {
     this.council = council
     this.motionIndex = motionIndex
 
-    if (this.data.voteType === LegacyMotionVoteType.Majority) {
-      this.votesToPass = Math.ceil(this.council.size / 2)
-    } else {
-      this.votesToPass = this.council.size
-    }
+    this.votesToPass = Math.ceil(this.council.size * this.requiredMajority)
   }
 
   public get authorId (): Snowflake {
