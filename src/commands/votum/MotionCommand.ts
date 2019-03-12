@@ -75,6 +75,13 @@ export default class MotionCommand extends Command {
 
     const [text, options] = result.value
 
+    if (options.majority && options.majority < this.council.getConfig('majorityMinimum')) {
+      return msg.reply(response(
+        ResponseType.Bad,
+        `The given majority type is disallowed by the ~majority.minimum~ configuration point. Please specify a higher majority.`
+      ))
+    }
+
     const motion = this.council.createMotion({
       text,
       authorId: msg.author.id,

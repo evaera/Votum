@@ -1,7 +1,7 @@
 import { ArgumentInfo } from 'discord.js-commando'
 import * as t from 'io-ts'
 import { MotionData, MotionMajorityType } from './MotionData'
-import { withDefault } from './Util'
+import { withDefault, betweenRange } from './Util'
 
 const OptionalConfigurableCouncilData = t.partial({
   councilorRole: t.string,
@@ -35,7 +35,8 @@ export interface OnFinishAction {
 
 const OptionalDefaultConfigurableCouncilData = t.type({
   userCooldown: withDefault(t.number, 0),
-  motionExpiration: withDefault(t.number, 0)
+  motionExpiration: withDefault(t.number, 0),
+  majorityMinimum: withDefault(betweenRange(0, 1), 0.5)
 })
 
 export const OptionalCouncilData = t.intersection([OptionalConfigurableCouncilData, OptionalDefaultConfigurableCouncilData])
@@ -57,6 +58,7 @@ interface Serializer<T> extends Partial<ArgumentInfo> {
 
 const hoursTransformSerialize = (n: number) => n * 3600000
 const hoursTransformDisplay = (n: number) => n / 3600000
+const percentDisplay = (n: number) => n.toLocaleString('en-us', { style: 'percent' })
 const getId = (e: { id: string }) => e.id
 export const ConfigurableCouncilDataSerializers: {
   [K in keyof Required<ConfigurableCouncilData>]: Serializer<
@@ -107,7 +109,11 @@ export const ConfigurableCouncilDataSerializers: {
   majorityDefault: {
     type: 'majority-type',
     serialize: t.identity,
-    display: n => n.toLocaleString('en-us', { style: 'percent' })
+    display: percentDisplay
+  },
+  majorityMinimum: {
+    type: 'float',
+    serialize: t.identity
   }
 }
 
