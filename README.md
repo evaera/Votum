@@ -28,7 +28,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 
 ### Configuration Points
 
-| Configuration | Value type | Description | Default |
+| Key | Value type | Description | Default |
 | ------------- | ---------- | ----------- | ------- |
 | `councilor.role` | `role` | Define a role that councilors must have to vote. Otherwise, anyone that can see the channel can vote and will be counted for the majority count. | None
 | `user.cooldown` | `number` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown). | `0`
@@ -94,7 +94,7 @@ Unanimous motion (all are equivalent):<br>
 
 1. Pick a channel that your councilors will deliberate in.
 2. Run `!Council My Council` to mark this channel as a council. (Change "My Council" to whatever you want it to be named.)
-3. Create a role for the members of your council and give it to your voters. Then, run `!CouncilorRole RoleNameHere`.
+3. Create a role for the members of your council and give it to your voters. Then, run `!config councilor.role RoleNameHere`.
 4. Run `!motion This is my first motion`. You're all done! Check out the other configuration options above for more advanced use.
 
 ## Finish Actions
