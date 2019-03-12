@@ -84,6 +84,8 @@ export default class MotionCommand extends Command {
       ))
     }
 
+    const motionAlreadyExists = this.council.currentMotion
+
     const motion = this.council.createMotion({
       text,
       authorId: msg.author.id,
@@ -97,7 +99,7 @@ export default class MotionCommand extends Command {
       options
     })
 
-    if (this.council.currentMotion) {
+    if (motionAlreadyExists) {
       return msg.reply(response(
         ResponseType.Good,
         'Your motion has been queued and will begin after the current motion.'
