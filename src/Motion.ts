@@ -272,7 +272,9 @@ export default class Motion {
     const votedUsers: {[index: string]: true} = {}
 
     for (let vote of this.data.votes) {
-      votedUsers[vote.authorId] = true
+      if (vote.state !== undefined) {
+        votedUsers[vote.authorId] = true
+      }
     }
 
     return this.council.members.filter(member => !votedUsers[member.id] && !member.user.bot)
