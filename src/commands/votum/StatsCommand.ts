@@ -85,6 +85,11 @@ export default class StatsCommand extends Command {
       }
 
       for (const vote of motion.votes) {
+        // If this is a quoted vote
+        if (vote.authorId === '0') {
+          continue
+        }
+
         if (lastVoted[vote.authorId] == null || lastVoted[vote.authorId] < motion.createdAt) {
           lastVoted[vote.authorId] = motion.createdAt
 
