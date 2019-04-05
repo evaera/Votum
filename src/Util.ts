@@ -127,6 +127,7 @@ export async function forwardMotion (motion: Motion, targetCouncilId: string, op
   motionData.resolution = MotionResolution.Unresolved
   motionData.active = true
   motionData.didExpire = false
+  motionData.createdAt = Date.now()
 
   const existingMotion = targetCouncil.currentMotion
   const newMotion = targetCouncil.createMotion(motionData)

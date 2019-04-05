@@ -80,6 +80,10 @@ export default class Motion {
     return this.data.createdAt
   }
 
+  public set createdAt (when: number) {
+    this.data.createdAt = when
+  }
+
   public get text (): string {
     return this.data.text
   }
@@ -246,6 +250,7 @@ export default class Motion {
 
     const newCurrentMotion = this.council.currentMotion
     if (newCurrentMotion) {
+      newCurrentMotion.createdAt = Date.now()
       setTimeout(() => newCurrentMotion.postMessage(true).then(() => undefined).catch(e => {
         throw e
       }), 2000)
