@@ -4,8 +4,11 @@
   <a href="https://discordapp.com/oauth2/authorize?client_id=430737691454341130&scope=bot&permissions=402656264"><img src="https://i.imgur.com/2UBikON.png" alt="Add" /></a>
   <br>
   <a href="https://github.com/evaera/Votum">View Source on GitHub</a>
+  <br><br>
+  <a href="https://discord.gg/27AhKrU"><img src="https://img.shields.io/discord/425800792679645204.svg?label=Discord" /></a>
 </p>
 
+> Need help? Have a suggestion, comment, or problem? Join the [Discord server](https://discord.gg/27AhKrU).
 
 # Votum
 
