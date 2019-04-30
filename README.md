@@ -47,6 +47,9 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `majority.minimum` | `majority-type` | The minimum majority councilors can create motions with. | 1/2
 | `majority.reached.ends` | `boolean` | Whether or not motions end as soon as majority is reached. Otherwise, all councilors will need to vote. | true
 | `on.finish.actions` | `json` | A set of actions that will take place when a motion resolves. See [Finish Actions](#finish-actions) | None
+| `reason.required.yes` | `boolean` | Whether or not the user must provide a reason with a positive vote. | true
+| `reason.required.no` | `boolean` | Whether or not the user must provide a reason with a negative vote. | true
+| `reason.required.abstain` | `boolean` | Whether or not the user must provide a reason with a neutral vote. | false
 
 ### Councilor commands
 

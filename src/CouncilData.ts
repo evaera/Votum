@@ -17,7 +17,9 @@ const OptionalConfigurableCouncilData = t.partial({
   councilorMotionDisable: t.boolean,
   motionQueue: t.boolean,
 
-  majorityDefault: MotionMajorityType
+  majorityDefault: MotionMajorityType,
+
+  reasonRequiredAbstain: t.boolean
 })
 
 export interface OnFinishActions {
@@ -41,7 +43,10 @@ const OptionalDefaultConfigurableCouncilData = t.type({
   motionExpiration: withDefault(t.number, 0),
 
   majorityMinimum: withDefault(betweenRange(0, 1), 0.5),
-  majorityReachedEnds: withDefault(t.boolean, true)
+  majorityReachedEnds: withDefault(t.boolean, true),
+
+  reasonRequiredYes: withDefault(t.boolean, true),
+  reasonRequiredNo: withDefault(t.boolean, true)
 })
 
 export const OptionalCouncilData = t.intersection([OptionalConfigurableCouncilData, OptionalDefaultConfigurableCouncilData])
@@ -129,6 +134,18 @@ export const ConfigurableCouncilDataSerializers: {
     serialize: t.identity
   },
   userCooldownKill: {
+    type: 'boolean',
+    serialize: t.identity
+  },
+  reasonRequiredYes: {
+    type: 'boolean',
+    serialize: t.identity
+  },
+  reasonRequiredNo: {
+    type: 'boolean',
+    serialize: t.identity
+  },
+  reasonRequiredAbstain: {
     type: 'boolean',
     serialize: t.identity
   }

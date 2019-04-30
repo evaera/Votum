@@ -3,16 +3,23 @@ import { Message } from 'discord.js'
 import Command from '../Command'
 import { CastVoteStatus } from '../../Motion'
 import Votum from '../../Votum'
+import { CouncilData } from '../../CouncilData'
+
+const reasonRequiredMap: {[index: string]: keyof CouncilData} = {
+  abstain: 'reasonRequiredAbstain',
+  yes: 'reasonRequiredYes',
+  no: 'reasonRequiredNo'
+}
 
 export default class VoteAliasCommand extends Command {
   protected state: 1 | 0 | -1
 
   async execute (msg: CommandMessage, args: any): Promise<Message | Message[]> {
-    if (this.council.currentMotion == null) {
+    if (!this.council.currentMotion) {
       return msg.reply('There is no motion active.')
     }
 
-    if (msg.command.name !== 'abstain' && !args.reason) {
+    if (!args.reason && this.council.getConfig(reasonRequiredMap[msg.command.name])) {
       return msg.reply('You must provide a reason with your vote.')
     }
 
