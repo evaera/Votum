@@ -5,6 +5,7 @@ import { withDefault, betweenRange } from './Util'
 
 const OptionalConfigurableCouncilData = t.partial({
   councilorRole: t.string,
+  proposeRole: t.string,
   announceChannel: t.string,
   userCooldownKill: t.boolean,
 
@@ -88,6 +89,10 @@ export const ConfigurableCouncilDataSerializers: {
     display: hoursTransformDisplay
   },
   councilorRole: {
+    type: 'role',
+    serialize: getId
+  },
+  proposeRole: {
     type: 'role',
     serialize: getId
   },

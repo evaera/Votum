@@ -56,6 +56,11 @@ export default class MotionCommand extends Command {
       return msg.reply('Creating motions is disabled in this council.')
     }
 
+    const proposeRole = this.council.getConfig('proposeRole')
+    if (proposeRole && !msg.member.roles.has(proposeRole)) {
+      return msg.reply("You don't have permission to propose motions.")
+    }
+
     if (args.text.length > 2000) {
       return msg.reply('Your motion is too long. The maximum length is 2000 characters.')
     }
