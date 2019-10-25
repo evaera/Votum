@@ -29,7 +29,6 @@ export default class Motion {
   public council: Council
   public motionIndex: number
   private data: MotionData
-  private votesToPass: number
 
   static parseMotionOptions (input: string): Either<t.Errors, [string, MotionOptions]> {
     const args = minimist<MotionMetaOptions & { [K in keyof MotionOptions]: string }>(input.split(' '), {
@@ -52,8 +51,6 @@ export default class Motion {
     this.data = motionData
     this.council = council
     this.motionIndex = motionIndex
-
-    this.votesToPass = Math.ceil(this.council.size * this.requiredMajority)
   }
 
   public get authorId (): Snowflake {
