@@ -2,12 +2,12 @@ import { Collection, GuildMember, Message, Snowflake, TextChannel } from 'discor
 import { Either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import minimist from 'minimist'
-import Council from './Council'
-import { MotionData, MotionMetaOptions, MotionOptions, MotionVote } from './MotionData'
-import Votum from './Votum'
 import num2fraction from 'num2fraction'
-import { forwardMotion } from './Util'
+import Council from './Council'
 import { OnFinishAction } from './CouncilData'
+import { MotionData, MotionMetaOptions, MotionOptions, MotionVote } from './MotionData'
+import { forwardMotion } from './Util'
+import Votum from './Votum'
 
 export enum LegacyMotionVoteType { Majority, Unanimous }
 export enum MotionResolution { Unresolved, Killed, Passed, Failed }
@@ -216,7 +216,7 @@ export default class Motion {
       no: votes[-1],
       yes: votes[1],
       abs: votes[0],
-      toPass: this.votesToPass - votes[0]
+      toPass: Math.ceil((this.council.size - votes[0]) * this.requiredMajority)
     }
   }
 
