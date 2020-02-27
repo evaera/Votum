@@ -161,7 +161,7 @@ export default class Council {
             fs.renameSync(this.dataPath, this.dataPath + ".bak")
           }
         } catch (e) {
-          console.log("Settings backup failed:" e)
+          console.log("Settings backup failed:", e)
         }
 
         fs.writeFile(
