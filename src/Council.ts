@@ -156,8 +156,12 @@ export default class Council {
 
     this.data = onChange(data, () => {
       setTimeout(() => {
-        if (fs.existsSync(this.dataPath)) {
-          fs.renameSync(this.dataPath, this.dataPath + ".bak")
+        try {
+          if (fs.existsSync(this.dataPath)) {
+            fs.renameSync(this.dataPath, this.dataPath + ".bak")
+          }
+        } catch (e) {
+          console.log("Settings backup failed:" e)
         }
 
         fs.writeFile(
