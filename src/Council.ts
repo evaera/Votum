@@ -169,7 +169,7 @@ export default class Council {
           JSON.stringify(this.data, undefined, 2),
           () => undefined
         )
-      }, 0)
+      }, 1)
     }) as CouncilData
   }
 }
