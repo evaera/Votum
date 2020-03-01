@@ -17,5 +17,8 @@
     "tslint": "^5.13.1",
     "tslint-config-standard": "^7.1.0",
     "typescript": "^3.3.3333"
+  },
+  "scripts": {
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\""
   }
 }

@@ -31,7 +31,7 @@ class Votum {
   }
 
   public static bootstrap(): Votum {
-    return new Votum()
+    return ((global as any).Votum = new Votum())
   }
 
   public getCouncil(id: Discord.Snowflake): Council {
