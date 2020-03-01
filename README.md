@@ -67,6 +67,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!abstain [reason]` | Abstain from voting with an optional reason.
 | `!lazyvoters` | Mentions any council members who haven't voted on the current motion yet.
 | `!archive [range]` | Allows you to view past motions. Provide a range of numbers to view a summary, or provide a single number to view a motion.
+| `!archive export` | Exports your council's data as a JSON file.
 
 #### Motion Options
 
