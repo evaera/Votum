@@ -15,6 +15,7 @@ const OptionalConfigurableCouncilData = t.partial({
   onFailedAnnounce: t.string,
 
   onFinishActions: t.unknown,
+  voteWeights: t.unknown,
 
   councilorMotionDisable: t.boolean,
   motionQueue: t.boolean,
@@ -123,6 +124,11 @@ export const ConfigurableCouncilDataSerializers: {
   },
   onFinishActions: {
     type: "finish-action",
+    serialize: t.identity,
+    display: x => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
+  },
+  voteWeights: {
+    type: "weights",
     serialize: t.identity,
     display: x => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
   },

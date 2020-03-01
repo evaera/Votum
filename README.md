@@ -49,6 +49,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `majority.minimum` | `majority-type` | The minimum majority councilors can create motions with. | 1/2
 | `majority.reached.ends` | `boolean` | Whether or not motions end as soon as majority is reached. Otherwise, all councilors will need to vote. | true
 | `on.finish.actions` | `json` | A set of actions that will take place when a motion resolves. See [Finish Actions](#finish-actions) | None
+| `vote.weights` | `json` | A map of User/Role IDs to the amount of votes that they are worth. Allows councilors to be worth different amounts of votes. See [Weighted Voting](#weighted-voting) | None
 | `reason.required.yes` | `boolean` | Whether or not the user must provide a reason with a positive vote. | true
 | `reason.required.no` | `boolean` | Whether or not the user must provide a reason with a negative vote. | true
 | `reason.required.abstain` | `boolean` | Whether or not the user must provide a reason with a neutral vote. | false
@@ -107,7 +108,7 @@ Unanimous motion (all are equivalent):<br>
 
 ## Finish Actions
 
-With the `on.finish.actions` configuration point, you can supply custom JSON configuration that tells Votum what to do with your motion once it resolves. Most prominently, you can forward your motion into other councils (based on the majority type) with potentially different options. Use [this link](https://json-editor.github.io/json-editor/?schema=N4IgJgpgZglgdjALjA9nAziAXKAhgY2TW1EQE8AHCbEXAJztzJABoRlEAbarEAQUKo4rEEggBbTDnaUeIFACMAVhEIiO3GgKLC2dCAEcArjH1hsAbVqDibRChABdNrjBgkQ3JwAKdFFTpkCCkoL3QINgo/AKCpPEQAWVwlFDokZmlyKho4I3EFCDp1JE1ePkQAAkQACxh0CvFk1PTeNkhQo05EbAAGNnF4GHE83v7cAA8hkawARjYIcdxxCm4pCx6AOgBWRwBfFxthTNkadEQ0uABzYq45bSERdtxO7t4RBaWV4MsQKFSAd3o5mcIAguXEPz+dEBdGB+3YDmO2V4Zwu1zsJTkAGEUEY4PgYJwKgBJAAij2gzy6NHei2Wqx+PSZACYAMxsnpsjns1lMpyRXCIRCFI4gAB6AAp1gBaACcjgA1ABKAAkIHh/h0cRkyJAqPg6PYmJoAHkKFqKvqrhT0Pg0uaHrwzRarZcKv9avhqhUUAA3QppSD1GoQCoLOrIK4NFA6H0OtCYeZ0r5rEDS6WNFJpcgVZkAelZTl2xeLbBVtuqElwNGqQooWDzeaU6DQ0orVY2qUuebAjCgiGlPQA7Hn240AMTqE68RQqNQY240ABqMbyFQSMaEFXuCZErncOi8vn8hVi2FCnHCLjgZBNUEsoH0xlMEHMWCsFFw6HCcJYj8MJhmJCuCEq+RZ/iAT6AWB74gAA1oS3BwiCUQnoEMDfNIn7fjBoAqvo968OOPbQIMWp5gQOg3KUIDeF+P7qmwoSgW+eEETQxHtGRQjoBRhzUXIABiIFIYx8GIbhID4dAHEkbACDkZRDwLjRADSEnmCWQA==&value=N4IgDghgzlCmAmIBcBtAugXyA===&lib_switcher=&prompt_before_delete&upload=function(a,b,c)%7Bconsole.log(%22Upload%20handler%20required%20for%20upload%20editor%22)%7D&theme=bootstrap2&iconlib=fontawesome4&object_layout=normal&show_errors=interaction) to be taken to a form where you can generate a valid JSON configuration for this option. The actions have these fields:
+With the `on.finish.actions` configuration point, you can supply custom JSON configuration that tells Votum what to do with your motion once it resolves. Most prominently, you can forward your motion into other councils (based on the majority type) with potentially different options. Use [this link](https://json-editor.github.io/json-editor/?data=N4Ig9gDgLglmB2BnEAuUMDGCA2MBGqIAZglAIYDuApomALZUCsIANOHgFZUZQD62ZAJ5gArlELwwAJzplsrEIgwALKrNSgAJlSIx4MWAmRoQZHnHgaQUQRCqEyUqUIWwo2eyhABBcwgUGasagNnaEYJzc4mxuHoS+hpZsUlQAjiIwKZqoANqmfknWYCAAumxkmpoGFnIAClKQVFKwNKhEcohUbBANds0wrSZkUACyZBzSBoJWoZ4g8CJ0eE2uBnFe3lAABFDKMIhbshNSU15s2u0i2OIoAAxsdHowdIuo9yCyAB7PrygAjGwqJ8yHQIB5jDlbgA6RglAC+5QKM1sc0QUBO8AA5qt3HMEhYFBcyFcbiAFECQWDBnkSFIKI5smUQFQFnRcsRpPSpIyEUVkWEvGiMdiYms5gBhUTwDAwbBbACSABFCTpiddCOTgaDwezbnqAEwAZiNtyNJuNhr1pW6wygTUsXgAegAKSEAWgAnCUANQASgAJCBeZBEsFrCjCEK9CLrGLCAB5aAWA5RrEqpQnJP+LyJ0NbVOYrYUPYqLZgABuTRO2gOuyoWyB+1gWMOYESZazSE1lJ1KDybrdR0mNi2+oA9IbSnDp9O2P6lKp1F5lFAoBAUGOxxxaPA3Qu1GQodJMWPNM4iFA3bcAOxj/eyADErgjXgiXB4OPWIAAam3FlsRjbCwtnxIwFAqKpEjqXomhaYx2mwTpyngQR4yIXJQBSdJMiobI+xACAyEQToeRYTC0gyLJ2XaWVcKnMiQCwyi6PwgBrWUPB5JkekafpBlAQjiJY0B/RSdCvAfU8dCeUMxzMRJPzmWoiJIoM2BozirFEnRCEki4ZOTOSkVFXFCAAMTIWjsl5djsE0kxtPEkA9Ok/RZPkgkTK/ABpDi6JnNhEGUMAKF4KtpGMEA9DtZxjOsRc5jwMA2yFMgIAAFiDOEgA==) to be taken to a form where you can generate a valid JSON configuration for this option. The actions have these fields:
 
 | field | type | description |
 | ----- | ---- | ----------- |
@@ -115,3 +116,20 @@ With the `on.finish.actions` configuration point, you can supply custom JSON con
 | to    | snowflake | The discord ID of the channel of the new council
 | atMajority? | number | A number between 0-1 that will filter this action from triggering unless the motion resolved with this given majority (optional)
 | options? | string | [Motion options](#motion-options)
+
+## Weighted Voting
+
+With the `vote.weights` configuration point, you can supply a JSON mapping between User and Role IDs to the amounts of votes that they will cast. If a councilor has more than one of the roles, their votes will be added together.
+
+The provided JSON should be an object which has role/user ID string keys mapped to numerical values. For example, this is a valid mapping:
+
+```json
+{
+  "113691352327389188": 5,
+  "400057282752151565": 2,
+  "601529861244321793": 4,
+  "401864080446717952": 8
+}
+```
+
+To learn how to get the user and role IDs, check out [this help article](https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-).

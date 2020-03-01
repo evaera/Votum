@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Votum Motion Vote Weights",
+  "additionalProperties": false,
+  "patternProperties": {
+    "[0-9]{1,}": {
+      "type": "number"
+    }
+  }
+}

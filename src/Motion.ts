@@ -9,7 +9,7 @@ import { Either } from "fp-ts/lib/Either"
 import * as t from "io-ts"
 import minimist from "minimist"
 import num2fraction from "num2fraction"
-import Council from "./Council"
+import Council, { CouncilWeights } from "./Council"
 import { OnFinishAction } from "./CouncilData"
 import {
   MotionData,
@@ -51,6 +51,7 @@ function getEmbedLength(embed: any): number {
 export default class Motion {
   public council: Council
   public motionIndex: number
+  private weights?: CouncilWeights
   private data: MotionData
 
   static parseMotionOptions(
@@ -150,6 +151,8 @@ export default class Motion {
     text?: string | true,
     channel?: TextChannel
   ): Promise<Message | Message[]> {
+    this.weights = await this.council.calculateWeights()
+
     let author
 
     try {
@@ -282,7 +285,9 @@ export default class Motion {
     let dictatorVoted = false
 
     for (const vote of this.data.votes) {
-      if (vote.state !== undefined) votes[vote.state]++
+      const weight = this.weights?.users[vote.authorId]
+
+      if (vote.state !== undefined) votes[vote.state] += weight || 1
 
       if (vote.isDictator && vote.state !== 0) dictatorVoted = true
     }
@@ -291,7 +296,10 @@ export default class Motion {
       no: votes[-1],
       yes: votes[1],
       abs: votes[0],
-      toPass: Math.ceil((this.council.size - votes[0]) * this.requiredMajority),
+      toPass: Math.ceil(
+        ((this.weights?.total || this.council.size) - votes[0]) *
+          this.requiredMajority
+      ),
       dictatorVoted,
     }
   }
@@ -479,8 +487,9 @@ export default class Motion {
     const fields: EmbedField[] = []
 
     for (const vote of this.data.votes) {
+      const weight = this.weights?.users[vote.authorId]
       fields.push({
-        name: vote.authorName,
+        name: vote.authorName + (weight && weight > 1 ? ` [${weight}]` : ""),
         value: `**${vote.name}**  ${vote.reason || ""}`.substring(0, 1024),
         inline: true,
       })

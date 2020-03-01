@@ -6,6 +6,11 @@ import { CouncilData, DefaultCouncilData } from "./CouncilData"
 import Motion from "./Motion"
 import { MotionData } from "./MotionData"
 
+export interface CouncilWeights {
+  users: { [index: string]: number }
+  total: number
+}
+
 export default class Council {
   private static defaultData = DefaultCouncilData
 
@@ -97,6 +102,50 @@ export default class Council {
     return this.data.motions.length
   }
 
+  public getVoteWeights() {
+    return this.getConfig("voteWeights") as
+      | { [index: string]: number }
+      | undefined
+  }
+
+  // TODO: Return object like {users: { id => weight}, total: number} and cache inside Motion
+  public async calculateWeights(): Promise<CouncilWeights> {
+    const weights = this.getVoteWeights()
+
+    if (!weights) {
+      return {
+        total: this.size,
+        users: {},
+      }
+    }
+
+    const users: { [index: string]: number } = {}
+    let total = 0
+
+    await Promise.all(
+      this.members.map(async member => {
+        let userTotal = 0
+
+        userTotal += weights[member.id] || 0
+
+        Object.entries(weights).forEach(([roleId, roleWeight]) => {
+          if (member.roles.has(roleId)) {
+            userTotal += roleWeight
+          }
+        })
+
+        total += userTotal > 0 ? userTotal : 1 // minimum 1 vote
+
+        if (userTotal > 0) users[member.id] = userTotal
+      })
+    )
+
+    return {
+      total,
+      users,
+    }
+  }
+
   public isUserOnCooldown(id: Snowflake): boolean {
     if (!this.data.userCooldowns[id]) {
       return false
@@ -160,9 +209,7 @@ export default class Council {
           if (fs.existsSync(this.dataPath)) {
             fs.renameSync(this.dataPath, this.dataPath + ".bak")
           }
-        } catch (e) {
-          console.log("Settings backup failed:", e)
-        }
+        } catch (e) {}
 
         fs.writeFile(
           this.dataPath,
