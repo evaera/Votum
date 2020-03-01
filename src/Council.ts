@@ -182,6 +182,10 @@ export default class Council {
     return new Motion(this.data.motions.length - 1, data, this)
   }
 
+  public exportData() {
+    return JSON.stringify(this.data, undefined, "\t")
+  }
+
   private loadData(useBackup?: boolean): void {
     let data: CouncilData
     try {
