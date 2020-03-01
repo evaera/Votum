@@ -53,14 +53,15 @@ export default class Command extends Commando.Command {
         !!msg.member.roles.find("name", "Votum Admin")
       )
     } else if (
-      this.council &&
+      council &&
       this.customInfo.allowWithConfigurableRoles &&
       this.customInfo.allowWithConfigurableRoles.find(
         configName =>
-          this.council.getConfig(configName) &&
-          msg.member.roles.has(this.council.getConfig(configName) as string)
+          council.getConfig(configName) &&
+          msg.member.roles.has(council.getConfig(configName) as string)
       )
     ) {
+      return true
     } else if (council.councilorRole != null) {
       return msg.member.roles.has(council.councilorRole)
     }
