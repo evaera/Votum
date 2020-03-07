@@ -35,7 +35,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | ------------- | ---------- | ----------- | ------- |
 | `councilor.role` | `role` | Define a role that councilors must have to vote. Otherwise, anyone that can see the channel can vote and will be counted for the majority count. | None
 | `propose.role` | `role` | Restricts proposing motions to users with this role only (in addition to the councilor role). | None
-| `dictator.role` | `role` | Any time a user with the dictator role votes, the motion will pass or fail immediately based on how they voted.
+| `dictator.role` | `role` | Any time a user with the dictator role votes, the motion will pass or fail immediately based on how they voted. | None
 | `user.cooldown` | `number` | Set the number of hours a councilor must wait between proposals. (Killed motions do not trigger the cooldown). | `0`
 | `user.cooldown.kill` | `boolean` | Whether or not killing motions should trigger the cooldown. | false
 | `motion.expiration` | `number` | Set the number of hours a motion can remain active. | `0`
