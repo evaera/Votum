@@ -76,18 +76,20 @@ export default class Council {
   }
 
   public get size(): number {
-    return this.members.size
+    const role = this.getCouncilorRole()
+    return role ? role.members.size : this.channel.members.size - 1
+  }
+
+  private getCouncilorRole() {
+    return this.councilorRole
+      ? this.channel.guild.roles.get(this.councilorRole)
+      : undefined
   }
 
   public get members(): Collection<Snowflake, GuildMember> {
-    const roleId = this.councilorRole || "0"
-    const role = this.channel.guild.roles.get(roleId)
+    const role = this.getCouncilorRole()
 
-    if (role) {
-      return role.members
-    } else {
-      return this.channel.members
-    }
+    return role ? role.members : this.channel.members
   }
 
   public get currentMotion(): Motion | undefined {
