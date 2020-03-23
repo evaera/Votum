@@ -269,6 +269,10 @@ export default class Motion {
     return CastVoteStatus.New
   }
 
+  private getTotal(): number {
+    return this.weights?.total || this.council.size
+  }
+
   public getVotes(): {
     yes: number
     no: number
@@ -296,10 +300,7 @@ export default class Motion {
       no: votes[-1],
       yes: votes[1],
       abs: votes[0],
-      toPass: Math.ceil(
-        ((this.weights?.total || this.council.size) - votes[0]) *
-          this.requiredMajority
-      ),
+      toPass: Math.ceil((this.getTotal() - votes[0]) * this.requiredMajority),
       dictatorVoted,
     }
   }
@@ -427,13 +428,19 @@ export default class Motion {
       this.data.votes.length === this.council.size
     ) {
       if (votes.yes >= votes.toPass) {
+        // Reached majority
         this.resolve(MotionResolution.Passed)
       } else if (
         this.data.voteType === LegacyMotionVoteType.Unanimous &&
         votes.no > 0
       ) {
+        // Legacy unanimous
         this.resolve(MotionResolution.Failed)
       } else if (votes.no >= votes.toPass || votes.toPass === 0) {
+        // If "no" has the majority...
+        this.resolve(MotionResolution.Failed)
+      } else if (this.getTotal() - (votes.no + votes.abs) < votes.toPass) {
+        // If a majority could no longer be reached
         this.resolve(MotionResolution.Failed)
       }
     }
