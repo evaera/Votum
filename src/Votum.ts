@@ -14,6 +14,20 @@ class Votum {
     this.bot = new Commando.CommandoClient({
       owner: process.env.OWNER,
       unknownCommandResponse: false,
+      disabledEvents: [
+        "TYPING_START",
+        "VOICE_STATE_UPDATE",
+        "PRESENCE_UPDATE",
+        "MESSAGE_DELETE",
+        "MESSAGE_UPDATE",
+        "CHANNEL_PINS_UPDATE",
+        "MESSAGE_REACTION_ADD",
+        "MESSAGE_REACTION_REMOVE",
+        "MESSAGE_REACTION_REMOVE_ALL",
+        "CHANNEL_PINS_UPDATE",
+        "MESSAGE_DELETE_BULK",
+        "WEBHOOKS_UPDATE",
+      ] as any,
       commandEditableDuration: 120,
     })
 
@@ -69,7 +83,7 @@ class Votum {
       .registerCommandsIn(path.join(__dirname, "./commands/votum"))
       .registerTypesIn(path.join(__dirname, "./types"))
 
-    this.bot.dispatcher.addInhibitor(msg => {
+    this.bot.dispatcher.addInhibitor((msg) => {
       const council = this.getCouncil(msg.channel.id)
 
       if (
