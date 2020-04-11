@@ -13,21 +13,20 @@ class Votum {
   constructor() {
     this.bot = new Commando.CommandoClient({
       owner: process.env.OWNER,
-      unknownCommandResponse: false,
-      disabledEvents: [
-        "TYPING_START",
-        "VOICE_STATE_UPDATE",
-        "PRESENCE_UPDATE",
-        "MESSAGE_DELETE",
-        "MESSAGE_UPDATE",
-        "CHANNEL_PINS_UPDATE",
-        "MESSAGE_REACTION_ADD",
-        "MESSAGE_REACTION_REMOVE",
-        "MESSAGE_REACTION_REMOVE_ALL",
-        "CHANNEL_PINS_UPDATE",
-        "MESSAGE_DELETE_BULK",
-        "WEBHOOKS_UPDATE",
-      ] as any,
+      // disabledEvents: [
+      //   "TYPING_START",
+      //   "VOICE_STATE_UPDATE",
+      //   "PRESENCE_UPDATE",
+      //   "MESSAGE_DELETE",
+      //   "MESSAGE_UPDATE",
+      //   "CHANNEL_PINS_UPDATE",
+      //   "MESSAGE_REACTION_ADD",
+      //   "MESSAGE_REACTION_REMOVE",
+      //   "MESSAGE_REACTION_REMOVE_ALL",
+      //   "CHANNEL_PINS_UPDATE",
+      //   "MESSAGE_DELETE_BULK",
+      //   "WEBHOOKS_UPDATE",
+      // ] as any,
       commandEditableDuration: 120,
     })
 
@@ -53,7 +52,7 @@ class Votum {
       return this.councilMap.get(id)!
     }
 
-    const channel = this.bot.channels.get(id)
+    const channel = this.bot.channels.cache.get(id)
 
     if (channel == null) {
       throw new Error("Channel doesn't exist.")
@@ -66,7 +65,7 @@ class Votum {
   }
 
   private setActivity(): void {
-    this.bot.user.setActivity("http://eryn.io/Votum")
+    this.bot.user?.setActivity("http://eryn.io/Votum")
   }
 
   private registerCommands(): void {

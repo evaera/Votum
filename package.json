@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "ajv": "^6.10.0",
-    "discord.js": "https://github.com/discordjs/discord.js.git#e431ccdad2d539fe6f6e35a836a2c83cc6308cdf",
-    "discord.js-commando": "https://github.com/discordjs/Commando.git#86545193be33c30be80dfaf898b5e9faf321e016",
+    "discord.js": "^12.1.1",
+    "discord.js-commando": "git+https://github.com/discordjs/Commando.git#master",
     "dotenv": "^5.0.1",
     "fp-ts": "^1.14.4",
     "io-ts": "^1.8.2",
@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/minimist": "^1.2.0",
     "@types/node": "^10.12.30",
-    "discord.js-typings": "https://github.com/discordjs/discord.js-typings.git#376000ebb8ee6f7287d6be387cae45d24b74bfa7",
+    "@types/ws": "^7.2.3",
     "tslint": "^5.13.1",
     "tslint-config-standard": "^7.1.0",
     "typescript": "^3.3.3333"

@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { CommandMessage } from "discord.js-commando"
+import { CommandoMessage } from "discord.js-commando"
 import { CouncilData } from "../../CouncilData"
 import { CastVoteStatus } from "../../Motion"
 import Votum from "../../Votum"
@@ -14,7 +14,7 @@ const reasonRequiredMap: { [index: string]: keyof CouncilData } = {
 export default class VoteAliasCommand extends Command {
   protected state: 1 | 0 | -1
 
-  async execute(msg: CommandMessage, args: any): Promise<Message | Message[]> {
+  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
     if (!this.council.currentMotion) {
       return msg.reply("There is no motion active.")
     }
@@ -41,7 +41,7 @@ export default class VoteAliasCommand extends Command {
       state: this.state,
       reason: args.reason,
       isDictator: this.council.getConfig("dictatorRole")
-        ? msg.member.roles.has(this.council.getConfig("dictatorRole")!)
+        ? msg.member.roles.cache.has(this.council.getConfig("dictatorRole")!)
         : false,
     })
 
@@ -57,7 +57,7 @@ export default class VoteAliasCommand extends Command {
     }
   }
 
-  private getVoteName(msg: CommandMessage) {
+  private getVoteName(msg: CommandoMessage) {
     let name = msg.command.name
 
     if (msg.cleanContent.substring(0, 1) === Votum.bot.commandPrefix) {

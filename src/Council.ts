@@ -82,7 +82,7 @@ export default class Council {
 
   private getCouncilorRole() {
     return this.councilorRole
-      ? this.channel.guild.roles.get(this.councilorRole)
+      ? this.channel.guild.roles.cache.get(this.councilorRole)
       : undefined
   }
 
@@ -125,13 +125,13 @@ export default class Council {
     let total = 0
 
     await Promise.all(
-      this.members.map(async member => {
+      this.members.map(async (member) => {
         let userTotal = 0
 
         userTotal += weights[member.id] || 0
 
         Object.entries(weights).forEach(([roleId, roleWeight]) => {
-          if (member.roles.has(roleId)) {
+          if (member.roles.cache.has(roleId)) {
             userTotal += roleWeight
           }
         })

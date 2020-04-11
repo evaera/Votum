@@ -1,12 +1,20 @@
-import { ArgumentCollector, CommandMessage, CommandoClient, ArgumentInfo } from 'discord.js-commando'
-import * as t from 'io-ts'
-import { Either } from 'fp-ts/lib/Either'
-import Motion, { MotionResolution } from './Motion'
-import Votum from './Votum'
+import {
+  ArgumentCollector,
+  ArgumentInfo,
+  CommandoClient,
+  CommandoMessage,
+} from "discord.js-commando"
+import { Either } from "fp-ts/lib/Either"
+import * as t from "io-ts"
+import Motion, { MotionResolution } from "./Motion"
+import Votum from "./Votum"
 
 export type ExtractRight<T> = T extends Either<infer L, infer R> ? R : never
 
-export function withDefault<T extends t.Any> (type: T, defaultValue: t.TypeOf<T>): t.Type<t.TypeOf<T>, t.TypeOf<T>> {
+export function withDefault<T extends t.Any>(
+  type: T,
+  defaultValue: t.TypeOf<T>
+): t.Type<t.TypeOf<T>, t.TypeOf<T>> {
   return new t.Type(
     `withDefault(${type.name}, ${JSON.stringify(defaultValue)})`,
     type.is,
@@ -15,53 +23,64 @@ export function withDefault<T extends t.Any> (type: T, defaultValue: t.TypeOf<T>
   )
 }
 
-export function betweenRange (min: number, max: number) {
+export function betweenRange(min: number, max: number) {
   return new t.Type(
     `range(${min}, ${max})`,
     t.number.is,
     (u, c) =>
-      t.number.validate(u, c).chain(s =>
-        s >= min && s <= max ? t.success(s) : t.failure(u, c)
-      ),
+      t.number
+        .validate(u, c)
+        .chain((s) => (s >= min && s <= max ? t.success(s) : t.failure(u, c))),
     t.identity
   )
 }
 
-export function inProps (name: string, type: t.IntersectionType<Array<t.InterfaceType<t.AnyProps>>>) {
+export function inProps(
+  name: string,
+  type: t.IntersectionType<Array<t.InterfaceType<t.AnyProps>>>
+) {
   return name in getProps(type)
 }
 
-export function getProps (codec: t.HasProps | t.ExactType<t.HasProps>): t.Props {
+export function getProps(codec: t.HasProps | t.ExactType<t.HasProps>): t.Props {
   switch (codec._tag) {
-    case 'ExactType':
+    case "ExactType":
       return getProps(codec.type)
-    case 'RefinementType':
-    case 'ReadonlyType':
+    case "RefinementType":
+    case "ReadonlyType":
       return getProps(codec.type)
-    case 'InterfaceType':
-    case 'StrictType':
-    case 'PartialType':
+    case "InterfaceType":
+    case "StrictType":
+    case "PartialType":
       return codec.props
-    case 'IntersectionType':
-      return codec.types.reduce<t.Props>((props, type) => Object.assign(props, getProps(type)), {})
+    case "IntersectionType":
+      return codec.types.reduce<t.Props>(
+        (props, type) => Object.assign(props, getProps(type)),
+        {}
+      )
   }
 }
 
-export function getDefaultValue (name: string, type: t.HasProps | t.ExactType<t.HasProps>) {
+export function getDefaultValue(
+  name: string,
+  type: t.HasProps | t.ExactType<t.HasProps>
+) {
   return getProps(type)[name].decode(undefined).getOrElse(undefined)
 }
 
-export async function parseType (
+export async function parseType(
   client: CommandoClient,
-  message: CommandMessage,
+  message: CommandoMessage,
   value: string,
-  info: Partial<ArgumentInfo> & { transform? (value: any): any }
+  info: Partial<ArgumentInfo> & { transform?(value: any): any }
 ) {
-  const collector = new ArgumentCollector(client, [{
-    key: 'value',
-    prompt: 'value',
-    ...info
-  }])
+  const collector = new ArgumentCollector(client, [
+    {
+      key: "value",
+      prompt: "value",
+      ...info,
+    },
+  ])
 
   const result = await collector.obtain(message, [value], 5)
 
@@ -81,23 +100,31 @@ export async function parseType (
 export enum ResponseType {
   Good = 0x2ecc71,
   Bad = 0xe74c3c,
-  Neutral = 0xe67e22
+  Neutral = 0xe67e22,
 }
-export function response (color: number, description: string, {
-  title
-}: {
-  title?: string
-} = {}) {
+export function response(
+  color: number,
+  description: string,
+  {
+    title,
+  }: {
+    title?: string
+  } = {}
+) {
   return {
     embed: {
-      description: description.replace(/~/g, '`'),
+      description: description.replace(/~/g, "`"),
       title,
-      color
-    }
+      color,
+    },
   }
 }
 
-export async function forwardMotion (motion: Motion, targetCouncilId: string, optionsString?: string) {
+export async function forwardMotion(
+  motion: Motion,
+  targetCouncilId: string,
+  optionsString?: string
+) {
   const targetCouncil = Votum.getCouncil(targetCouncilId)
 
   if (!targetCouncil.enabled) {
@@ -114,15 +141,14 @@ export async function forwardMotion (motion: Motion, targetCouncilId: string, op
 
       motionData.options = {
         ...motionData.options,
-        ...options
+        ...options,
       }
     }
   }
 
   motionData.votes.forEach((vote: any) => {
     vote.state = undefined
-    vote.authorId = '0',
-    vote.authorName = `»${vote.authorName}`
+    ;(vote.authorId = "0"), (vote.authorName = `»${vote.authorName}`)
   })
   motionData.resolution = MotionResolution.Unresolved
   motionData.active = true

@@ -1,5 +1,5 @@
 import { Message, TextChannel } from "discord.js"
-import { CommandMessage, CommandoClient } from "discord.js-commando"
+import { CommandoClient, CommandoMessage } from "discord.js-commando"
 import { MotionResolution } from "../../Motion"
 import Command from "../Command"
 
@@ -23,7 +23,7 @@ export default class ArchiveCommand extends Command {
     })
   }
 
-  async execute(msg: CommandMessage, args: any): Promise<Message | Message[]> {
+  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
     let raw = args.range as string
 
     if (raw.trim() === "export") {

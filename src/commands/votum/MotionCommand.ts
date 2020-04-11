@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-import { CommandMessage, CommandoClient } from "discord.js-commando"
+import { CommandoClient, CommandoMessage } from "discord.js-commando"
 import { PathReporter } from "io-ts/lib/PathReporter"
 import Motion, { LegacyMotionVoteType, MotionResolution } from "../../Motion"
 import { response, ResponseType } from "../../Util"
@@ -25,7 +25,7 @@ export default class MotionCommand extends Command {
     })
   }
 
-  async execute(msg: CommandMessage, args: any): Promise<Message | Message[]> {
+  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
     if (!args.text) {
       if (this.council.currentMotion) {
         return this.council.currentMotion.postMessage()
@@ -41,7 +41,7 @@ export default class MotionCommand extends Command {
         if (
           this.council.currentMotion.authorId === msg.author.id ||
           msg.member.hasPermission("MANAGE_GUILD") ||
-            !!msg.member.roles.find("name", "Votum Admin")
+          !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
         ) {
           const motion = this.council.currentMotion
           motion.resolve(MotionResolution.Killed)
@@ -65,7 +65,7 @@ export default class MotionCommand extends Command {
     }
 
     const proposeRole = this.council.getConfig("proposeRole")
-    if (proposeRole && !msg.member.roles.has(proposeRole)) {
+    if (proposeRole && !msg.member.roles.cache.has(proposeRole)) {
       return msg.reply("You don't have permission to propose motions.")
     }
 

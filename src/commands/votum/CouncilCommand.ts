@@ -1,33 +1,36 @@
-import { CommandoClient, CommandMessage } from 'discord.js-commando'
-import { Message } from 'discord.js'
-import Command from '../Command'
+import { Message } from "discord.js"
+import { CommandoClient, CommandoMessage } from "discord.js-commando"
+import Command from "../Command"
 
 export default class CouncilCommand extends Command {
-  constructor (client: CommandoClient) {
+  constructor(client: CommandoClient) {
     super(client, {
-      name: 'council',
-      description: 'Designates the channel this command is run in as a council channel.',
+      name: "council",
+      description:
+        "Designates the channel this command is run in as a council channel.",
       councilOnly: false,
       adminOnly: true,
 
       args: [
         {
-          key: 'name',
+          key: "name",
           prompt: 'The name of this council, or "remove" to remove.',
-          type: 'string',
-          default: 'Council'
-        }
-      ]
+          type: "string",
+          default: "Council",
+        },
+      ],
     })
   }
 
-  async execute (msg: CommandMessage, args: any): Promise<Message | Message[]> {
-    if (args.name === 'remove') {
+  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
+    if (args.name === "remove") {
       if (this.council.enabled) {
         this.council.enabled = false
-        return msg.reply(`Removed council "${this.council.name}". (Note: Settings are still saved if you ever enable a council in this channel again.)`)
+        return msg.reply(
+          `Removed council "${this.council.name}". (Note: Settings are still saved if you ever enable a council in this channel again.)`
+        )
       } else {
-        return msg.reply('There is no council enabled in this channel.')
+        return msg.reply("There is no council enabled in this channel.")
       }
     }
 

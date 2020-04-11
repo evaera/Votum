@@ -237,7 +237,7 @@ export default class Motion {
       embeds[currentIndex].fields.push(field)
     }
 
-    return embeds.map(embed =>
+    return embeds.map((embed) =>
       (channel || this.council.channel).send(
         typeof text !== "undefined"
           ? text === true
@@ -324,7 +324,7 @@ export default class Motion {
       if (this.council.announceChannel) {
         this.postMessage(
           "",
-          this.council.channel.guild.channels.get(
+          this.council.channel.guild.channels.cache.get(
             this.council.announceChannel
           ) as TextChannel
         )
@@ -337,7 +337,7 @@ export default class Motion {
     ) {
       this.postMessage(
         "",
-        this.council.channel.guild.channels.get(
+        this.council.channel.guild.channels.cache.get(
           this.council.getConfig("onPassedAnnounce")!
         ) as TextChannel
       )
@@ -347,7 +347,7 @@ export default class Motion {
     ) {
       this.postMessage(
         "",
-        this.council.channel.guild.channels.get(
+        this.council.channel.guild.channels.cache.get(
           this.council.getConfig("onFailedAnnounce")!
         ) as TextChannel
       )
@@ -357,7 +357,7 @@ export default class Motion {
     ) {
       this.postMessage(
         "",
-        this.council.channel.guild.channels.get(
+        this.council.channel.guild.channels.cache.get(
           this.council.getConfig("onKilledAnnounce")!
         ) as TextChannel
       )
@@ -371,7 +371,7 @@ export default class Motion {
           newCurrentMotion
             .postMessage(true)
             .then(() => undefined)
-            .catch(e => {
+            .catch((e) => {
               throw e
             }),
         2000
@@ -404,7 +404,7 @@ export default class Motion {
     }
 
     return this.council.members.filter(
-      member => !votedUsers[member.id] && !member.user.bot
+      (member) => !votedUsers[member.id] && !member.user.bot
     )
   }
 
@@ -510,11 +510,11 @@ export default class Motion {
     return Promise.all(
       actions
         .filter(
-          action =>
+          (action) =>
             action.atMajority === undefined ||
             Math.abs(action.atMajority - this.requiredMajority) < 0.01
         )
-        .map(action => {
+        .map((action) => {
           switch (action.action) {
             case "forward":
               return forwardMotion(this, action.to, action.options)

@@ -40,7 +40,7 @@ export default class Command extends Commando.Command {
       typeof customInfo.adminOnly === "undefined" ? false : customInfo.adminOnly
   }
 
-  public hasPermission(msg: Commando.CommandMessage): boolean {
+  public hasPermission(msg: Commando.CommandoMessage): boolean {
     const council = Votum.getCouncil(msg.channel.id)
 
     if (this.client.isOwner(msg.author)) {
@@ -50,27 +50,27 @@ export default class Command extends Commando.Command {
     if (this.adminOnly) {
       return (
         msg.member.hasPermission("MANAGE_GUILD") ||
-        !!msg.member.roles.find("name", "Votum Admin")
+        !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
       )
     } else if (
       council &&
       this.customInfo.allowWithConfigurableRoles &&
       this.customInfo.allowWithConfigurableRoles.find(
-        configName =>
+        (configName) =>
           council.getConfig(configName) &&
-          msg.member.roles.has(council.getConfig(configName) as string)
+          msg.member.roles.cache.has(council.getConfig(configName) as string)
       )
     ) {
       return true
     } else if (council.councilorRole != null) {
-      return msg.member.roles.has(council.councilorRole)
+      return msg.member.roles.cache.has(council.councilorRole)
     }
 
     return true
   }
 
   public async execute(
-    msg: Commando.CommandMessage,
+    msg: Commando.CommandoMessage,
     args: any,
     fromPattern?: boolean
   ): Promise<Message | Message[] | undefined> {
@@ -78,7 +78,7 @@ export default class Command extends Commando.Command {
   }
 
   public async run(
-    msg: Commando.CommandMessage,
+    msg: Commando.CommandoMessage,
     args: any,
     fromPattern?: boolean
   ): Promise<Message | Message[]> {
