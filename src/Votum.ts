@@ -78,6 +78,7 @@ class Votum {
         commandState: false,
         prefix: false,
         help: true,
+        unknownCommand: false,
       })
       .registerCommandsIn(path.join(__dirname, "./commands/votum"))
       .registerTypesIn(path.join(__dirname, "./types"))
