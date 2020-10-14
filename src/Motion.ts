@@ -228,7 +228,7 @@ export default class Motion {
         ) as TextChannel) || postChannel
     }
 
-    postChannel.send(`Motion ${this.number} Transcript`, {
+    postChannel.send("", {
       files: [
         {
           name: `${this.council.name}-motion-${this.number}-transcript.txt`,
