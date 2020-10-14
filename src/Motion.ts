@@ -590,7 +590,8 @@ export default class Motion {
 
     if (
       this.council.getConfig("majorityReachedEnds") ||
-      this.data.votes.length === this.council.size
+      [...this.data.votes].filter((vote) => vote.state !== undefined).length ===
+        this.council.size
     ) {
       if (votes.yes >= votes.toPass) {
         // Reached majority
