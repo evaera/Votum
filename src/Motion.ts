@@ -255,6 +255,10 @@ export default class Motion {
   }
 
   private async createDeliberationChannel() {
+    if (this.resolution !== MotionResolution.Unresolved) {
+      return
+    }
+
     if (!this.council.getConfig("createDeliberationChannels")) {
       return
     }
