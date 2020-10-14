@@ -240,7 +240,9 @@ export default class Motion {
 
   private async deleteDeliberationChannel() {
     if (this.data.deliberationChannelId) {
-      await this.generateTranscript()
+      if (this.council.getConfig("keepTranscripts")) {
+        await this.generateTranscript()
+      }
       const channel = this.council.channel.guild.channels.cache.find(
         (channel) => channel.id === this.data.deliberationChannelId
       )
