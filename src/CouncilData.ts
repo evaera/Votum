@@ -23,7 +23,9 @@ const OptionalConfigurableCouncilData = t.partial({
   majorityDefault: MotionMajorityType,
 
   reasonRequiredAbstain: t.boolean,
+
   createDeliberationChannels: t.boolean,
+  keepTranscripts: t.boolean,
 })
 
 export interface OnFinishActions {
@@ -171,6 +173,10 @@ export const ConfigurableCouncilDataSerializers: {
     serialize: t.identity,
   },
   createDeliberationChannels: {
+    type: "boolean",
+    serialize: t.identity,
+  },
+  keepTranscripts: {
     type: "boolean",
     serialize: t.identity,
   },

@@ -148,19 +148,111 @@ export default class Motion {
     return num2fraction(this.requiredMajority)
   }
 
-  public async deleteDeliberationChannel() {
+  private async generateTranscript() {
+    if (!this.data.deliberationChannelId) {
+      return
+    }
+
+    const channel = this.council.channel.guild.channels.cache.find(
+      (channel) => channel.id === this.data.deliberationChannelId
+    ) as TextChannel | undefined
+
+    if (!channel) {
+      return
+    }
+
+    const messages: string[] = []
+    let lastId: string | undefined
+
+    for (let i = 0; i < 20; i++) {
+      const collection = await channel.messages.fetch({
+        limit: 50,
+        ...(lastId && {
+          before: lastId,
+        }),
+      })
+
+      const batch = collection.array()
+
+      for (const message of batch) {
+        messages.push(
+          `${new Date(message.createdTimestamp).toISOString()} <${
+            message.author.tag
+          }> ${message.content.replace(/(\n\n+)/g, "\n")}`
+        )
+      }
+
+      if (batch.length < 50) {
+        break
+      }
+
+      lastId = batch[batch.length - 1].id
+    }
+
+    messages.reverse()
+
+    const votes = this.getVotes()
+
+    const header = [
+      `Council: ${this.council.name}`,
+      `Date: ${new Date().toISOString()}`,
+      `Motion: #${this.number}`,
+      `Resolution: ${MotionResolution[this.resolution]}`,
+      `Proposed by: ${this.authorName}`,
+      "",
+      `For: ${votes.yes}`,
+      `Against: ${votes.no}`,
+      `Abstain: ${votes.abs}`,
+      "",
+      "#".repeat(50),
+      "",
+      this.text,
+      "",
+      "#".repeat(50),
+      "",
+      [...this.data.votes]
+        .map((vote) => `<${vote.authorName}> **${vote.name}** ${vote.reason}`)
+        .join("\n\n"),
+      "",
+      "#".repeat(50),
+    ]
+
+    const transcript = [header.join("\n"), messages.join("\n\n")].join("\n\n")
+
+    let postChannel = this.council.channel
+
+    if (this.council.announceChannel) {
+      postChannel =
+        (this.council.channel.guild.channels.resolve(
+          this.council.announceChannel
+        ) as TextChannel) || postChannel
+    }
+
+    postChannel.send(`Motion ${this.number} Transcript`, {
+      files: [
+        {
+          name: `${this.council.name}-motion-${this.number}-transcript.txt`,
+          attachment: Buffer.from(transcript),
+        },
+      ],
+    })
+  }
+
+  private async deleteDeliberationChannel() {
     if (this.data.deliberationChannelId) {
+      await this.generateTranscript()
       const channel = this.council.channel.guild.channels.cache.find(
         (channel) => channel.id === this.data.deliberationChannelId
       )
 
       if (channel) {
+        this.data.deliberationChannelId = undefined
         channel.delete()
       }
     }
   }
 
-  public async createDeliberationChannel() {
+  private async createDeliberationChannel() {
     if (!this.council.getConfig("createDeliberationChannels")) {
       return
     }
