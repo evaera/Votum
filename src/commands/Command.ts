@@ -47,19 +47,21 @@ export default class Command extends Commando.Command {
       return true
     }
 
+    const isAdmin =
+      msg.member.hasPermission("MANAGE_GUILD") ||
+      !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
+
     if (this.adminOnly) {
-      return (
-        msg.member.hasPermission("MANAGE_GUILD") ||
-        !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
-      )
+      return isAdmin
     } else if (
       council &&
       this.customInfo.allowWithConfigurableRoles &&
-      this.customInfo.allowWithConfigurableRoles.find(
-        (configName) =>
-          council.getConfig(configName) &&
-          msg.member.roles.cache.has(council.getConfig(configName) as string)
-      )
+      (isAdmin ||
+        this.customInfo.allowWithConfigurableRoles.find(
+          (configName) =>
+            council.getConfig(configName) &&
+            msg.member.roles.cache.has(council.getConfig(configName) as string)
+        ))
     ) {
       return true
     } else if (council.councilorRole != null) {
