@@ -30,7 +30,7 @@ export default class ArchiveCommand extends Command {
       return msg.reply("Here's your council's data:", {
         files: [
           {
-            name: this.council.name + ".json",
+            name: `${this.council.name}-${new Date().toISOString()}.json`,
             attachment: Buffer.from(this.council.exportData()),
           },
         ],
