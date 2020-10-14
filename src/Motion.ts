@@ -164,7 +164,7 @@ export default class Motion {
     const messages: string[] = []
     let lastId: string | undefined
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
       const collection = await channel.messages.fetch({
         limit: 50,
         ...(lastId && {
