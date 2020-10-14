@@ -14,6 +14,7 @@ export interface MotionData {
   deletedAt?: number
   didExpire: boolean
   votes: MotionVote[]
+  deliberationChannelId?: Snowflake
   options?: MotionOptions
 }
 
@@ -30,13 +31,13 @@ export const MotionMajorityType = new t.Type(
   "MotionMajorityType",
   t.number.is,
   (i, c) => {
-    return t.string.decode(i).chain(str => {
+    return t.string.decode(i).chain((str) => {
       str = str.trim()
 
       if (str.endsWith("%")) {
         return t.number
           .decode(Number(str.substr(0, str.length - 1)))
-          .chain(number => {
+          .chain((number) => {
             if (Number.isNaN(number) || number < 0 || number > 100) {
               return t.failure(i, c, "Invalid percentage: must be 0-100")
             } else {
@@ -46,11 +47,11 @@ export const MotionMajorityType = new t.Type(
       } else if ((str.match(/\//g) || []).length === 1) {
         const operands = str.split("/")
 
-        const ea = operands.map(operand => t.number.decode(Number(operand)))
+        const ea = operands.map((operand) => t.number.decode(Number(operand)))
 
-        if (ea.every(e => e.isRight())) {
+        if (ea.every((e) => e.isRight())) {
           const [dividend, divisor] = ea.map(
-            e => e.value as ExtractRight<typeof e>
+            (e) => e.value as ExtractRight<typeof e>
           )
 
           return t.success(dividend / divisor)

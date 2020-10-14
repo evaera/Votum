@@ -53,6 +53,7 @@ export default class Motion {
   public motionIndex: number
   private weights?: CouncilWeights
   private data: MotionData
+  private creatingChannelPromise?: Promise<unknown>
 
   static parseMotionOptions(
     input: string
@@ -147,10 +148,80 @@ export default class Motion {
     return num2fraction(this.requiredMajority)
   }
 
+  public async deleteDeliberationChannel() {
+    if (this.data.deliberationChannelId) {
+      const channel = this.council.channel.guild.channels.cache.find(
+        (channel) => channel.id === this.data.deliberationChannelId
+      )
+
+      if (channel) {
+        channel.delete()
+      }
+    }
+  }
+
+  public async createDeliberationChannel() {
+    if (!this.council.getConfig("createDeliberationChannels")) {
+      return
+    }
+
+    if (this.creatingChannelPromise) {
+      await this.creatingChannelPromise.catch(() => {})
+    }
+
+    if (this.data.deliberationChannelId) {
+      return
+    }
+
+    const guild = this.council.channel.guild
+
+    const categoryName = this.council.name
+      .replace(/[^a-zA-Z\- ]/g, "")
+      .replace(/\s+/g, "-")
+
+    let category = guild.channels.cache.find(
+      (channel) => channel.type === "category" && channel.name === categoryName
+    )
+
+    if (!category) {
+      category = await guild.channels.create(categoryName, {
+        type: "category",
+      })
+    }
+
+    const channelName = `motion-${this.number}`
+
+    const channelPromise = guild.channels.create(channelName, {
+      type: "text",
+      parent: category,
+
+      ...(this.council.councilorRole && {
+        permissionOverwrites: [
+          {
+            id: guild.roles.everyone!,
+            deny: "VIEW_CHANNEL",
+          },
+          {
+            id: this.council.councilorRole,
+            allow: "VIEW_CHANNEL",
+          },
+        ],
+      }),
+    })
+
+    this.creatingChannelPromise = channelPromise
+    const channel = await channelPromise
+    this.creatingChannelPromise = undefined
+
+    this.data.deliberationChannelId = channel.id
+  }
+
   public async postMessage(
     text?: string | true,
     channel?: TextChannel
   ): Promise<Message | Message[]> {
+    this.createDeliberationChannel()
+
     this.weights = await this.council.calculateWeights()
 
     let author
@@ -377,6 +448,8 @@ export default class Motion {
         2000
       )
     }
+
+    this.deleteDeliberationChannel()
 
     const actions = this.council.getConfig("onFinishActions") as any
     if (!actions) return

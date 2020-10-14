@@ -23,6 +23,7 @@ const OptionalConfigurableCouncilData = t.partial({
   majorityDefault: MotionMajorityType,
 
   reasonRequiredAbstain: t.boolean,
+  createDeliberationChannels: t.boolean,
 })
 
 export interface OnFinishActions {
@@ -125,12 +126,12 @@ export const ConfigurableCouncilDataSerializers: {
   onFinishActions: {
     type: "finish-action",
     serialize: t.identity,
-    display: x => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
+    display: (x) => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
   },
   voteWeights: {
     type: "weights",
     serialize: t.identity,
-    display: x => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
+    display: (x) => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
   },
   councilorMotionDisable: {
     type: "boolean",
@@ -166,6 +167,10 @@ export const ConfigurableCouncilDataSerializers: {
     serialize: t.identity,
   },
   reasonRequiredAbstain: {
+    type: "boolean",
+    serialize: t.identity,
+  },
+  createDeliberationChannels: {
     type: "boolean",
     serialize: t.identity,
   },
