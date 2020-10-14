@@ -26,7 +26,7 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `!Council [name]` | Create a council (or rename) in the channel you run this in, with an optional name.
 | `!Council remove` | Remove a council from the channel you run this in.
 | `!CouncilStats` | Displays some statistics about your council.
-| `!SetWeight [user/role] [weight] | Sets the vote weight for users with a role or a user. See [Weighted Voting](#weighted-voting)
+| `!SetWeight [user/role] [weight]` | Sets the vote weight for users with a role or a user. See [Weighted Voting](#weighted-voting)
 | `!VoteWeights` | Display the current vote weights. See [Weighted Voting](#weighted-voting)
 | `!config [key] [value]` | Configures a setting in this council. See the table below.
 | `!config [key] $remove`  | Sets this setting back to its default.
