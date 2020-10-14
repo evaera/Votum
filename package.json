@@ -6,7 +6,7 @@
     "dotenv": "^5.0.1",
     "fp-ts": "^1.14.4",
     "io-ts": "^1.8.2",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "num2fraction": "^1.2.2",
     "on-change": "^0.1.0"
   },
