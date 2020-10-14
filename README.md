@@ -53,6 +53,8 @@ These commands can only be run by someone with the `Manage Server` permission, o
 | `reason.required.yes` | `boolean` | Whether or not the user must provide a reason with a positive vote. | true
 | `reason.required.no` | `boolean` | Whether or not the user must provide a reason with a negative vote. | true
 | `reason.required.abstain` | `boolean` | Whether or not the user must provide a reason with a neutral vote. | false
+| `create.deliberation.channels` | `boolean` | Whether or not to create deliberation channels for each motion. | false
+| `keep.transcripts` | `boolean` | Whether or not to keep transcripts of the deliberation channels before they are deleted. | false
 
 ### Councilor commands
 
@@ -99,6 +101,7 @@ Unanimous motion (all are equivalent):<br>
 - The councilor cooldown is not triggered if the motion is killed.
 - When a motion expires, the outcome is determined by majority votes. If there are more "yes" than "no" votes, it will pass, and vice-versa.
 - If you do not set a Councilor role, the total number of voters is determined by who can see the channel. It's recommended that you set a role for councilors so that you can be sure that only possible voters count towards the total number needed for majority.
+- Server admins (or people with a role called `Votum Admin`) can always create motions.
 
 ## Quick set-up guide
 
