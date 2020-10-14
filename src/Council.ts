@@ -5,6 +5,9 @@ import * as path from "path"
 import { CouncilData, DefaultCouncilData } from "./CouncilData"
 import Motion from "./Motion"
 import { MotionData } from "./MotionData"
+import { response, ResponseType } from "./Util"
+
+const BACKUP_PERIOD = 1000 * 60 * 60 * 24 * 7 // one week
 
 export interface CouncilWeights {
   users: { [index: string]: number }
@@ -25,6 +28,10 @@ export default class Council {
 
     this.dataPath = path.join(__dirname, `../data/${this.id}.json`)
     this.loadData()
+
+    if (this.enabled) {
+      this.backupCheck()
+    }
   }
 
   public get enabled() {
@@ -78,6 +85,29 @@ export default class Council {
   public get size(): number {
     const role = this.getCouncilorRole()
     return role ? role.members.size : this.channel.members.size - 1
+  }
+
+  private performAutomaticBackup() {
+    this.channel.send({
+      embed: response(
+        ResponseType.Good,
+        "↑ Automatically backed up council data. ↑"
+      ).embed,
+      files: [
+        {
+          name: `${this.name}-${new Date().toISOString()}.json`,
+          attachment: Buffer.from(this.exportData()),
+        },
+      ],
+    })
+
+    this.data.lastBackup = Date.now()
+  }
+
+  private backupCheck() {
+    if (Date.now() - this.data.lastBackup > BACKUP_PERIOD) {
+      this.performAutomaticBackup()
+    }
   }
 
   private getCouncilorRole() {

@@ -187,6 +187,7 @@ interface StaticCouncilData {
   name: string
   userCooldowns: { [index: string]: number }
   motions: MotionData[]
+  lastBackup: number
 }
 
 export type CouncilData = StaticCouncilData & ConfigurableCouncilData
@@ -204,5 +205,6 @@ export const DefaultCouncilData: CouncilData = {
   name: "Council",
   userCooldowns: {},
   motions: [],
+  lastBackup: 0,
   ...defaultConfigurableData.value,
 }
