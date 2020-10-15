@@ -1,5 +1,5 @@
 import {
-  Collection,
+  Channel, Collection,
   GuildMember,
   Message,
   Snowflake,
@@ -277,38 +277,13 @@ export default class Motion {
 
     const guild = this.council.channel.guild
 
-    const categoryName = this.council.name
-      .replace(/[^a-zA-Z\- ]/g, "")
-      .replace(/\s+/g, "-")
-
-    let category = guild.channels.cache.find(
-      (channel) => channel.type === "category" && channel.name === categoryName
-    )
-
-    if (!category) {
-      category = await guild.channels.create(categoryName, {
-        type: "category",
-      })
-    }
-
     const channelName = `motion-${this.number}`
 
     const channelPromise = guild.channels.create(channelName, {
       type: "text",
-      parent: category,
+      parent: this.council.channel.parent as Channel,
 
-      ...(this.council.councilorRole && {
-        permissionOverwrites: [
-          {
-            id: guild.roles.everyone!,
-            deny: "VIEW_CHANNEL",
-          },
-          {
-            id: this.council.councilorRole,
-            allow: "VIEW_CHANNEL",
-          },
-        ],
-      }),
+      permissionOverwrites: this.council.channel.permissionOverwrites
     })
 
     this.creatingChannelPromise = channelPromise
