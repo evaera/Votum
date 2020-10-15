@@ -211,7 +211,7 @@ export default class Council {
   public createMotion(data: MotionData): Motion {
     this.data.motions.push(data)
 
-    return new Motion(this.data.motions.length - 1, data, this)
+    return new Motion(this.data.motions.length - 1, this.data.motions[this.data.motions.length - 1], this)
   }
 
   public exportData() {

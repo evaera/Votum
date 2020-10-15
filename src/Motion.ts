@@ -3,7 +3,7 @@ import {
   GuildMember,
   Message,
   Snowflake,
-  TextChannel,
+  TextChannel
 } from "discord.js"
 import { Either } from "fp-ts/lib/Either"
 import * as t from "io-ts"
@@ -15,7 +15,7 @@ import {
   MotionData,
   MotionMetaOptions,
   MotionOptions,
-  MotionVote,
+  MotionVote
 } from "./MotionData"
 import { forwardMotion } from "./Util"
 import Votum from "./Votum"
@@ -175,6 +175,10 @@ export default class Motion {
       const batch = collection.array()
 
       for (const message of batch) {
+        if (message.author.bot) {
+          continue
+        }
+
         messages.push(
           `${new Date(message.createdTimestamp).toISOString()} <${
             message.author.tag
@@ -312,6 +316,14 @@ export default class Motion {
     this.creatingChannelPromise = undefined
 
     this.data.deliberationChannelId = channel.id
+
+    const motionMessage = await this.postMessage("", channel)
+
+    const messages = Array.isArray(motionMessage) ? motionMessage : [motionMessage]
+
+    for (const message of messages) {
+      await message.pin()
+    }
   }
 
   public async postMessage(
