@@ -218,24 +218,30 @@ export default class Council {
     return JSON.stringify(this.data, undefined, "\t")
   }
 
-  private loadData(useBackup?: boolean): void {
+  private loadData(attempt = 0): void {
     let data: CouncilData
-    try {
-      const parsedSettings = JSON.parse(
-        fs.readFileSync(this.dataPath + (useBackup ? ".bak" : ""), {
-          encoding: "utf8",
-        })
-      )
-      data = Object.assign(
-        {},
-        JSON.parse(JSON.stringify(Council.defaultData)),
-        parsedSettings
-      )
-    } catch (e) {
-      if (!useBackup) {
-        return this.loadData(true)
-      }
 
+    if (fs.existsSync(this.dataPath)) {
+      try {
+        const parsedSettings = JSON.parse(
+          fs.readFileSync(this.dataPath, {
+            encoding: "utf8",
+          })
+        )
+        data = Object.assign(
+          {},
+          JSON.parse(JSON.stringify(Council.defaultData)),
+          parsedSettings
+        )
+      } catch (e) {
+        if (attempt > 10) {
+          console.error(`Council ${this.id} data couldn't be loaded`, e)
+          throw new Error("Council data could not be loaded, perhaps it's corrupted.")
+        }
+
+        return this.loadData(attempt + 1)
+      }
+    } else {
       data = JSON.parse(JSON.stringify(Council.defaultData))
     }
 
@@ -243,15 +249,22 @@ export default class Council {
       setTimeout(() => {
         try {
           if (fs.existsSync(this.dataPath)) {
-            fs.renameSync(this.dataPath, this.dataPath + ".bak")
+            fs.copyFileSync(this.dataPath, this.dataPath + ".bak")
           }
         } catch (e) {}
 
-        fs.writeFile(
-          this.dataPath,
-          JSON.stringify(this.data, undefined, 2),
-          () => undefined
-        )
+        for (let i = 0; i<10; i++) {
+          try {
+            fs.writeFileSync(
+              this.dataPath,
+              JSON.stringify(this.data, undefined, 2)
+            )
+
+            break
+          } catch(e) {
+            console.error("Could not save council data", e)
+          }
+        }
       }, 1)
     }) as CouncilData
   }
