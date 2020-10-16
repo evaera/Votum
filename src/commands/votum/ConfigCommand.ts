@@ -3,14 +3,14 @@ import { CommandoClient, CommandoMessage } from "discord.js-commando"
 import {
   ConfigurableCouncilData,
   ConfigurableCouncilDataSerializers,
-  OptionalCouncilData,
+  OptionalCouncilData
 } from "../../CouncilData"
 import {
   getDefaultValue,
   getProps,
   parseType,
   response,
-  ResponseType,
+  ResponseType
 } from "../../Util"
 import Command from "../Command"
 
@@ -95,7 +95,10 @@ export default class ConfigCommand extends Command {
           `Configuration point ${args.key} is currently set to ~${display(
             this.council.getConfig(key)
           )}~.`
-        )
+        ),
+        {
+          split: true
+        }
       )
     }
 
@@ -120,7 +123,10 @@ export default class ConfigCommand extends Command {
         response(
           ResponseType.Good,
           `Set configuration point ~${key}~ to ${display(value)}`
-        )
+        ),
+        {
+          split: true
+        }
       )
     } else {
       return msg.reply(

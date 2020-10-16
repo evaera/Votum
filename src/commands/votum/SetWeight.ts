@@ -61,7 +61,10 @@ export default class SetWeightCommand extends Command {
 
     return msg.reply(
       (args.target ? `Set ${args.target}'s weight to ${args.weight}.\n` : "") +
-        `\n${lines.join("\n")}`
+        `\n${lines.join("\n")}`,
+        {
+          split: true
+        }
     )
   }
 }
