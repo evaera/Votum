@@ -95,10 +95,7 @@ export default class ConfigCommand extends Command {
           `Configuration point ${args.key} is currently set to ~${display(
             this.council.getConfig(key)
           )}~.`
-        ),
-        {
-          split: true
-        }
+        )
       )
     }
 
@@ -123,10 +120,7 @@ export default class ConfigCommand extends Command {
         response(
           ResponseType.Good,
           `Set configuration point ~${key}~ to ${display(value)}`
-        ),
-        {
-          split: true
-        }
+        )
       )
     } else {
       return msg.reply(
