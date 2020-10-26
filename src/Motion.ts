@@ -286,6 +286,8 @@ export default class Motion {
       permissionOverwrites: this.council.channel.permissionOverwrites
     })
 
+    channelPromise.catch(console.error)
+
     this.creatingChannelPromise = channelPromise
     const channel = await channelPromise
     this.creatingChannelPromise = undefined
