@@ -1,9 +1,10 @@
 import {
-  Channel, Collection,
+  Channel,
+  Collection,
   GuildMember,
   Message,
   Snowflake,
-  TextChannel
+  TextChannel,
 } from "discord.js"
 import { Either } from "fp-ts/lib/Either"
 import * as t from "io-ts"
@@ -15,7 +16,7 @@ import {
   MotionData,
   MotionMetaOptions,
   MotionOptions,
-  MotionVote
+  MotionVote,
 } from "./MotionData"
 import { forwardMotion } from "./Util"
 import Votum from "./Votum"
@@ -145,7 +146,14 @@ export default class Motion {
       return "Unanimous"
     }
 
-    return num2fraction(this.requiredMajority)
+    switch (this.requiredMajority) {
+      case 1:
+        return "Unanimous"
+      case 0.5:
+        return "Simple majority"
+      default:
+        return num2fraction(this.requiredMajority)
+    }
   }
 
   private async generateTranscript() {
@@ -283,7 +291,7 @@ export default class Motion {
       type: "text",
       parent: this.council.channel.parent as Channel,
 
-      permissionOverwrites: this.council.channel.permissionOverwrites
+      permissionOverwrites: this.council.channel.permissionOverwrites,
     })
 
     channelPromise.catch(console.error)
@@ -296,7 +304,9 @@ export default class Motion {
 
     const motionMessage = await this.postMessage("", channel)
 
-    const messages = Array.isArray(motionMessage) ? motionMessage : [motionMessage]
+    const messages = Array.isArray(motionMessage)
+      ? motionMessage
+      : [motionMessage]
 
     for (const message of messages) {
       await message.pin()
@@ -454,11 +464,18 @@ export default class Motion {
       if (vote.isDictator && vote.state !== 0) dictatorVoted = true
     }
 
+    let toPass = Math.ceil((this.getTotal() - votes[0]) * this.requiredMajority)
+
+    if (this.requiredMajority === 0.5 && toPass < this.getTotal()) {
+      // Simple majority
+      toPass += 1
+    }
+
     return {
       no: votes[-1],
       yes: votes[1],
       abs: votes[0],
-      toPass: Math.ceil((this.getTotal() - votes[0]) * this.requiredMajority),
+      toPass,
       dictatorVoted,
     }
   }
