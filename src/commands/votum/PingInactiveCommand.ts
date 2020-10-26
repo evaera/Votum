@@ -14,6 +14,7 @@ export default class PingInactiveCommand extends Command {
       ],
       description:
         "Mention the remaining councilmembers who haven't voted yet.",
+      adminsAlwaysAllowed: true
     })
   }
 

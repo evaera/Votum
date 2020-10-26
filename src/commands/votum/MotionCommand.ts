@@ -13,6 +13,7 @@ export default class MotionCommand extends Command {
       description: "Create a motion",
 
       allowWithConfigurableRoles: ["proposeRole"],
+      adminsAlwaysAllowed: true,
 
       args: [
         {

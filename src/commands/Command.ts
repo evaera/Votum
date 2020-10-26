@@ -10,6 +10,7 @@ interface CustomCommandInfo {
   description: string
   councilOnly?: boolean
   adminOnly?: boolean
+  adminsAlwaysAllowed?: boolean
   args?: Commando.ArgumentInfo[]
   allowWithConfigurableRoles?: Array<keyof CouncilData>
 }
@@ -17,6 +18,7 @@ interface CustomCommandInfo {
 export default class Command extends Commando.Command {
   public councilOnly: boolean
   public adminOnly: boolean
+  public adminsAlwaysAllowed: boolean
   protected council: Council
   private customInfo: CustomCommandInfo
 
@@ -38,6 +40,8 @@ export default class Command extends Commando.Command {
         : customInfo.councilOnly
     this.adminOnly =
       typeof customInfo.adminOnly === "undefined" ? false : customInfo.adminOnly
+
+    this.adminsAlwaysAllowed = !!customInfo.adminsAlwaysAllowed
   }
 
   public hasPermission(msg: Commando.CommandoMessage): boolean {
@@ -53,15 +57,16 @@ export default class Command extends Commando.Command {
 
     if (this.adminOnly) {
       return isAdmin
+    } else if (isAdmin && this.adminsAlwaysAllowed) {
+      return true
     } else if (
       council &&
       this.customInfo.allowWithConfigurableRoles &&
-      (isAdmin ||
-        this.customInfo.allowWithConfigurableRoles.find(
-          (configName) =>
-            council.getConfig(configName) &&
-            msg.member.roles.cache.has(council.getConfig(configName) as string)
-        ))
+      this.customInfo.allowWithConfigurableRoles.find(
+        (configName) =>
+          council.getConfig(configName) &&
+          msg.member.roles.cache.has(council.getConfig(configName) as string)
+      )
     ) {
       return true
     } else if (council.councilorRole != null) {
