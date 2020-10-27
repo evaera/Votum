@@ -466,7 +466,11 @@ export default class Motion {
 
     let toPass = Math.ceil((this.getTotal() - votes[0]) * this.requiredMajority)
 
-    if (this.requiredMajority === 0.5 && toPass < this.getTotal()) {
+    if (
+      this.requiredMajority === 0.5 &&
+      toPass < this.getTotal() &&
+      toPass / this.getTotal() === 0.5
+    ) {
       // Simple majority
       toPass += 1
     }
