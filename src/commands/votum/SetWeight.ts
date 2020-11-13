@@ -29,51 +29,44 @@ export default class SetWeightCommand extends Command {
   }
 
   async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
-    try {
-      const weights = this.council.getVoteWeights() || {}
+    const weights = this.council.getVoteWeights() || {}
 
-      if (args.target !== "" && typeof args.weight === "number") {
-        if (args.weight < 0) {
-          return msg.reply("Weight must not be less than zero")
-        }
-
-        if (args.weight === 1) {
-          delete weights[args.target.id]
-        } else {
-          weights[args.target.id] = args.weight
-        }
-
-        this.council.setConfig("voteWeights", weights)
+    if (args.target !== "" && typeof args.weight === "number") {
+      if (args.weight < 0) {
+        return msg.reply("Weight must not be less than zero")
       }
 
-      const lines = []
-      for (const [id, weight] of Object.entries(weights)) {
-        const maybeRole = await msg.guild.roles.fetch(id)
-        const maybeUser = maybeRole
-          ? null
-          : await msg.guild.members.fetch(id).catch(() => null)
-
-        if (maybeRole) {
-          lines.push(`[Role] ${maybeRole.name} : ${weight}`)
-        } else if (maybeUser) {
-          lines.push(`[User] ${maybeUser.user.tag} : ${weight}`)
-        } else {
-          lines.push(`[Unknown] ${id} : ${weight}`)
-        }
+      if (args.weight === 1) {
+        delete weights[args.target.id]
+      } else {
+        weights[args.target.id] = args.weight
       }
 
-      return msg.reply(
-        (args.target
-          ? `Set ${args.target}'s weight to ${args.weight}.\n`
-          : "") + `\n${lines.join("\n")}`,
-        {
-          split: true,
-        }
-      )
-    } catch (e) {
-      console.error(e)
-
-      return msg.reply("An error occurred")
+      this.council.setConfig("voteWeights", weights)
     }
+
+    const lines = []
+    for (const [id, weight] of Object.entries(weights)) {
+      const maybeRole = await msg.guild.roles.fetch(id)
+      const maybeUser = maybeRole
+        ? null
+        : await msg.guild.members.fetch(id).catch(() => null)
+
+      if (maybeRole) {
+        lines.push(`[Role] ${maybeRole.name} : ${weight}`)
+      } else if (maybeUser) {
+        lines.push(`[User] ${maybeUser.user.tag} : ${weight}`)
+      } else {
+        lines.push(`[Unknown] ${id} : ${weight}`)
+      }
+    }
+
+    return msg.reply(
+      (args.target ? `Set ${args.target}'s weight to ${args.weight}.\n` : "") +
+        `\n${lines.join("\n")}`,
+      {
+        split: true,
+      }
+    )
   }
 }
