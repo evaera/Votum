@@ -89,14 +89,20 @@ export default class Command extends Commando.Command {
     args: any,
     fromPattern?: boolean
   ): Promise<Message | Message[]> {
-    this.council = Votum.getCouncil(msg.channel.id)
+    try {
+      this.council = Votum.getCouncil(msg.channel.id)
 
-    const reply = this.execute(msg, args, fromPattern)
+      const reply = this.execute(msg, args, fromPattern)
 
-    if (reply == null) {
-      return msg.reply("Command executed.")
+      if (reply == null) {
+        return msg.reply("Command executed.")
+      }
+
+      return reply as Promise<Message | Message[]>
+    } catch (e) {
+      console.error(e)
+
+      return msg.reply("Sorry, an error occurred executing the command.")
     }
-
-    return reply as Promise<Message | Message[]>
   }
 }
