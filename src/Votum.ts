@@ -6,8 +6,8 @@ import Council from "./Council"
 
 require("dotenv").config()
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', reason.stack || reason)
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", reason.stack || reason)
   // Recommended: send the information to sentry.io
   // or whatever crash reporting service you use
 })
@@ -33,6 +33,9 @@ class Votum {
       //   "MESSAGE_DELETE_BULK",
       //   "WEBHOOKS_UPDATE",
       // ] as any,
+      ws: {
+        intents: ["GUILD_MEMBERS", "GUILDS", "GUILD_MESSAGES"],
+      },
       commandEditableDuration: 120,
     })
 
