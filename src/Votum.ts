@@ -37,7 +37,6 @@ class Votum {
         intents: ["GUILD_MEMBERS", "GUILDS", "GUILD_MESSAGES"],
       },
       commandEditableDuration: 120,
-      fetchAllMembers: true,
     })
 
     this.councilMap = new Map()
