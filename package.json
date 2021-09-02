@@ -2,7 +2,7 @@
   "dependencies": {
     "ajv": "^6.10.0",
     "discord.js": "^12.5.1",
-    "discord.js-commando": "git+https://github.com/discordjs/Commando.git#master",
+    "discord.js-commando": "git+https://github.com/discordjs/Commando.git#198d7604e3725ee88dceab9b5f296edb1b7580a5",
     "dotenv": "^5.0.1",
     "fp-ts": "^1.14.4",
     "io-ts": "^1.8.2",
