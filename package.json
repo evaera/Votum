@@ -11,14 +11,17 @@
     "on-change": "^0.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/minimist": "^1.2.0",
     "@types/node": "^10.12.30",
     "@types/ws": "^7.2.3",
+    "jest": "^27.1.0",
     "tslint": "^5.13.1",
     "tslint-config-standard": "^7.1.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.9.7"
   },
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node dist/index.js\""
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "test": "tsc && jest dist"
   }
 }

@@ -10,6 +10,7 @@ import { Either } from "fp-ts/lib/Either"
 import * as t from "io-ts"
 import minimist from "minimist"
 import num2fraction from "num2fraction"
+import calculateVoteTotals from "./calculateVoteTotals"
 import Council, { CouncilWeights } from "./Council"
 import { OnFinishAction } from "./CouncilData"
 import {
@@ -74,10 +75,9 @@ export default class Motion {
       args.majority = "100%"
     }
 
-    return MotionOptions.decode(args).map((options): [
-      string,
-      MotionOptions
-    ] => [args._.join(" "), options])
+    return MotionOptions.decode(args).map(
+      (options): [string, MotionOptions] => [args._.join(" "), options]
+    )
   }
 
   constructor(motionIndex: number, motionData: MotionData, council: Council) {
@@ -450,40 +450,12 @@ export default class Motion {
     toPass: number
     dictatorVoted: boolean
   } {
-    const votes = {
-      [-1]: 0,
-      [0]: 0,
-      [1]: 0,
-    }
-
-    let dictatorVoted = false
-
-    for (const vote of this.data.votes) {
-      const weight = this.weights?.users[vote.authorId]
-
-      if (vote.state !== undefined) votes[vote.state] += weight || 1
-
-      if (vote.isDictator && vote.state !== 0) dictatorVoted = true
-    }
-
-    let toPass = Math.ceil((this.getTotal() - votes[0]) * this.requiredMajority)
-
-    if (
-      this.requiredMajority === 0.5 &&
-      toPass < this.getTotal() &&
-      toPass / this.getTotal() === 0.5
-    ) {
-      // Simple majority
-      toPass += 1
-    }
-
-    return {
-      no: votes[-1],
-      yes: votes[1],
-      abs: votes[0],
-      toPass,
-      dictatorVoted,
-    }
+    return calculateVoteTotals({
+      votes: this.data.votes,
+      requiredMajority: this.requiredMajority,
+      totalSize: this.getTotal(),
+      weights: this.weights,
+    })
   }
 
   public resolve(resolution: MotionResolution): void {
