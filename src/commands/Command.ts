@@ -92,6 +92,8 @@ export default class Command extends Commando.Command {
     try {
       this.council = Votum.getCouncil(msg.channel.id)
 
+      await this.council.initialize()
+
       const reply = this.execute(msg, args, fromPattern)
 
       if (reply == null) {
