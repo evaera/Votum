@@ -139,3 +139,9 @@ The provided JSON should be an object which has role/user ID string keys mapped 
 ```
 
 To learn how to get the user and role IDs, check out [this help article](https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-).
+
+<style>
+h1:not([id]) {
+  display: none;
+  }
+</style>
