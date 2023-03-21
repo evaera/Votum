@@ -151,5 +151,5 @@ h1:not([id]) {
 For those who want to be more orientated on the code structure, we also have a class diagram.
 
 <p align="center">
-  <a href="https://user-images.githubusercontent.com/68979925/226760016-1c1f7290-9287-4f82-af37-bad7f257c326.png"><img src="https://user-images.githubusercontent.com/68979925/226760016-1c1f7290-9287-4f82-af37-bad7f257c326.png" alt="Votum" /></a>
+  <a href="https://user-images.githubusercontent.com/68979925/226760016-1c1f7290-9287-4f82-af37-bad7f257c326.png"><img src="https://user-images.githubusercontent.com/68979925/226760016-1c1f7290-9287-4f82-af37-bad7f257c326.png" alt="Class Diagram" /></a>
 </p>
