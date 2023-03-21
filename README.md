@@ -140,8 +140,10 @@ The provided JSON should be an object which has role/user ID string keys mapped 
 
 To learn how to get the user and role IDs, check out [this help article](https://support.discordapp.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-).
 
-<style>
-h1:not([id]) {
-  display: none;
-  }
-</style>
+## Class Diagram
+
+For those who want to be more orientated on the code structure, we also have a class diagram.
+
+<p align="center">
+  <a href="https://user-images.githubusercontent.com/68979925/226760016-1c1f7290-9287-4f82-af37-bad7f257c326.png"><img src="https://user-images.githubusercontent.com/68979925/226760016-1c1f7290-9287-4f82-af37-bad7f257c326.png" alt="Votum" /></a>
+</p>
