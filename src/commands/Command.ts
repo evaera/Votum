@@ -52,7 +52,9 @@ export default class Command extends Commando.Command {
     }
 
     const isAdmin =
+      // @ts-ignore
       msg.member.hasPermission("MANAGE_GUILD") ||
+      // @ts-ignore
       !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
 
     if (this.adminOnly) {
@@ -65,11 +67,13 @@ export default class Command extends Commando.Command {
       this.customInfo.allowWithConfigurableRoles.find(
         (configName) =>
           council.getConfig(configName) &&
+          // @ts-ignore
           msg.member.roles.cache.has(council.getConfig(configName) as string)
       )
     ) {
       return true
     } else if (council.councilorRole != null) {
+      // @ts-ignore
       return msg.member.roles.cache.has(council.councilorRole)
     }
 
