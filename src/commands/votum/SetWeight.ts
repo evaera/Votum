@@ -47,10 +47,12 @@ export default class SetWeightCommand extends Command {
 
     const lines = []
     for (const [id, weight] of Object.entries(weights)) {
+      // @ts-ignore
       const maybeRole = await msg.guild.roles.fetch(id)
       const maybeUser = maybeRole
         ? null
-        : await msg.guild.members.fetch(id).catch(() => null)
+        : // @ts-ignore
+          await msg.guild.members.fetch(id).catch(() => null)
 
       if (maybeRole) {
         lines.push(`[Role] ${maybeRole.name} : ${weight}`)

@@ -21,6 +21,7 @@ export default class VoteAliasCommand extends Command {
 
     if (
       !args.reason &&
+      // @ts-ignore
       this.council.getConfig(reasonRequiredMap[msg.command.name])
     ) {
       return msg.reply("You must provide a reason with your vote.")
@@ -36,12 +37,14 @@ export default class VoteAliasCommand extends Command {
 
     const voteStatus = motion.castVote({
       authorId: msg.author.id,
+      // @ts-ignore
       authorName: msg.member.displayName,
       name: this.getVoteName(msg),
       state: this.state,
       reason: args.reason,
       isDictator: this.council.getConfig("dictatorRole")
-        ? msg.member.roles.cache.has(this.council.getConfig("dictatorRole")!)
+        ? // @ts-ignore
+          msg.member.roles.cache.has(this.council.getConfig("dictatorRole")!)
         : false,
     })
 
@@ -58,6 +61,7 @@ export default class VoteAliasCommand extends Command {
   }
 
   private getVoteName(msg: CommandoMessage) {
+    // @ts-ignore
     let name = msg.command.name
 
     if (msg.cleanContent.substring(0, 1) === Votum.bot.commandPrefix) {

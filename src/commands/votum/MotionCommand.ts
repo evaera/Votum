@@ -27,6 +27,7 @@ export default class MotionCommand extends Command {
   }
 
   async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
+    // @ts-ignore
     await msg.guild.members.fetch() // Privileged intents fix
 
     if (!args.text) {
@@ -43,7 +44,9 @@ export default class MotionCommand extends Command {
       if (args.text === "kill") {
         if (
           this.council.currentMotion.authorId === msg.author.id ||
+          // @ts-ignore
           msg.member.hasPermission("MANAGE_GUILD") ||
+          // @ts-ignore
           !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
         ) {
           const motion = this.council.currentMotion
@@ -68,6 +71,7 @@ export default class MotionCommand extends Command {
     }
 
     const proposeRole = this.council.getConfig("proposeRole")
+    // @ts-ignore
     if (proposeRole && !msg.member.roles.cache.has(proposeRole)) {
       return msg.reply("You don't have permission to propose motions.")
     }
@@ -121,6 +125,7 @@ export default class MotionCommand extends Command {
     const motion = this.council.createMotion({
       text,
       authorId: msg.author.id,
+      // @ts-ignore
       authorName: msg.member.displayName,
       createdAt: Date.now(),
       voteType,
