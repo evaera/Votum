@@ -63,8 +63,28 @@ test("Test motion majorities", () => {
     foo.options = {majority: 1}
     expect(motion.requiredMajority).toBe(1)
 })
-
+describe("Test getReadableMajorities", () => {
+    test("Test getReadableMajorities return Unanimous", () => {
+        //@ts-ignore
+        const motion = new Motion(0, foo, {
+            getConfig: jest.fn().mockReturnValue(1),
+        })
+        expect(motion.getReadableMajority()).toBe("Unanimous")
+    })
+    test("Test getReadableMajorities return Simple Majority", () => {
+        //@ts-ignore
+        const motion = new Motion(0, foo, {
+            getConfig: jest.fn().mockReturnValue(0.5),
+        })
+        expect(motion.getReadableMajority()).toBe("Simple majority")
+    })
+    test("Test getReadableMajorities return default value", () => {
+        //@ts-ignore
+        const motion = new Motion(0, foo, {
+            getConfig: jest.fn().mockReturnValue("s"),
+        })
+        expect(motion.getReadableMajority()).toBe("1/2")
+    })
 })
 
-    //return null/undefined on the first //
-    //mock return values
+})
