@@ -5,6 +5,7 @@ import { promises as fs } from "fs"
 import path from "path"
 import { MotionData } from "./MotionData"
 import { MotionResolution } from "./Motion"
+import { getCouncil } from "./__mocks__/council"
 
 jest.mock("./Votum", () => jest.fn().mockImplementation(() => ({})))
 
@@ -62,6 +63,7 @@ test("Test motion majorities", () => {
     expect(motion.requiredMajority).toBe(0.5)
     foo.options = {majority: 1}
     expect(motion.requiredMajority).toBe(1)
+    foo.options = undefined
 })
 describe("Test getReadableMajorities", () => {
     test("Test getReadableMajorities return Unanimous", () => {
@@ -78,13 +80,23 @@ describe("Test getReadableMajorities", () => {
         })
         expect(motion.getReadableMajority()).toBe("Simple majority")
     })
-    test("Test getReadableMajorities return default value", () => {
+    test("Test getReadableMajorities return fraction of value", () => {
         //@ts-ignore
         const motion = new Motion(0, foo, {
-            getConfig: jest.fn().mockReturnValue("s"),
+            getConfig: jest.fn().mockReturnValue("0.75"),
         })
-        expect(motion.getReadableMajority()).toBe("1/2")
+        expect(motion.getReadableMajority()).toBe("3/4")
     })
+})
+test("Test Resolve", () => {
+    //@ts-ignore
+    const motion = new Motion(0, foo, getCouncil())
+    //@ts-ignore
+    expect(() => {motion.resolve({})}).toThrow(Error)
+
+    foo.active = true
+    //@ts-ignore
+    expect(motion.resolve({})).toBe(undefined)
 })
 
 })
