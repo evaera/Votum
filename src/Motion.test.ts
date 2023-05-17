@@ -88,15 +88,45 @@ describe("Test getReadableMajorities", () => {
         expect(motion.getReadableMajority()).toBe("3/4")
     })
 })
-test("Test Resolve", () => {
+describe("Test Resolve", () => {
     //@ts-ignore
     const motion = new Motion(0, foo, getCouncil())
-    //@ts-ignore
-    expect(() => {motion.resolve({})}).toThrow(Error)
+    test("Test Attempt to resolve a resolved motion error", () => {
+        //@ts-ignore
+        expect(() => {motion.resolve({})}).toThrow(Error)
+    })
+    test("Test data is active", () => {
+        foo.active = true
+        //@ts-ignore
+        expect(motion.resolve({})).toBe(undefined)
+        expect(foo.active).toBe(false)
+        expect(foo.resolution).toBe(foo.resolution)
+        expect(foo.didExpire).toBe(false)
+    })
 
-    foo.active = true
-    //@ts-ignore
-    expect(motion.resolve({})).toBe(undefined)
+    test("Test MotionResolution Failed", () =>{
+        foo.active = true
+        motion.council.setConfig("onFailedAnnounce", "foo")
+        const motionResolve = MotionResolution.Failed
+        motion.resolve(motionResolve)
+        expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
+    })
+
+    test("Test MotionResolution Passed", () =>{
+        foo.active = true
+        motion.council.setConfig("onPassedAnnounce", "foo")
+        const motionResolve = MotionResolution.Passed
+        motion.resolve(motionResolve)
+        expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
+    })
+
+    test("Test MotionResolution Killed", () =>{
+        foo.active = true
+        motion.council.setConfig("onKilledAnnounce", "foo")
+        const motionResolve = MotionResolution.Killed
+        motion.resolve(motionResolve)
+        expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
+    })
 })
 
 })
