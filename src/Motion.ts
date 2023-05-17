@@ -142,9 +142,9 @@ export default class Motion {
   }
 
   public getReadableMajority(): string {
-    if (this.requiredMajority === 1) {
-      return "Unanimous"
-    }
+     //if (this.requiredMajority === 1) {
+     //  return "Unanimous"
+     //}
 
     switch (this.requiredMajority) {
       case 1:
