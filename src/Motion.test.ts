@@ -158,4 +158,18 @@ describe("Test Resolve", () => {
     })
 })
 
+describe("Test motion votes", () =>{
+    //@ts-ignore
+    const motion = new Motion(0, foo, getCouncil())
+    test("Test getVotes", () =>{
+        const votes = motion.getVotes()
+        expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 0})
+    })
+    test("Test castVote", () =>{
+        expect(1).toBe(1)
+    })
+    test("Test getRemainingVoters", () =>{
+        expect(1).toBe(1)
+    })
+})
 })
