@@ -103,21 +103,25 @@ describe("Test Resolve", () => {
         expect(foo.resolution).toBe(foo.resolution)
         expect(foo.didExpire).toBe(false)
     })
-
+    
+    //mock post message to test it on another set of tests
+    motion.postMessage = jest.fn()
+    
     test("Test MotionResolution Failed", () =>{
         foo.active = true
         motion.council.setConfig("onFailedAnnounce", "foo")
         const motionResolve = MotionResolution.Failed
         motion.resolve(motionResolve)
         expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
+        expect(foo.active).toBe(false)
     })
-
     test("Test MotionResolution Passed", () =>{
         foo.active = true
         motion.council.setConfig("onPassedAnnounce", "foo")
         const motionResolve = MotionResolution.Passed
         motion.resolve(motionResolve)
         expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
+        expect(foo.active).toBe(false)
     })
 
     test("Test MotionResolution Killed", () =>{
@@ -126,6 +130,31 @@ describe("Test Resolve", () => {
         const motionResolve = MotionResolution.Killed
         motion.resolve(motionResolve)
         expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
+        expect(foo.active).toBe(false)
+    })
+
+    test("Test actions", () =>{
+        foo.active = true
+        motion.council.setConfig("onFinishActions", "forward")
+        motion.council.setConfig("onFailedAnnounce", "foo")
+        var motionResolve = MotionResolution.Failed
+        motion.resolve(motionResolve)
+
+        foo.active = true
+        motion.council.setConfig("onFinishActions", "forward")
+        motion.council.setConfig("onPassedAnnounce", "foo")
+        motionResolve = MotionResolution.Passed
+        motion.resolve(motionResolve)
+
+        foo.deliberationChannelId = "s"
+        motion.council.setConfig("keepTranscripts", true)
+        foo.active = true
+        motion.council.setConfig("onFinishActions", "forward")
+        motion.council.setConfig("onKilledAnnounce", "foo")
+        motionResolve = MotionResolution.Killed
+        motion.resolve(motionResolve)
+        expect(foo.active).toBe(false)
+        expect(foo.deliberationChannelId).toBe("s")
     })
 })
 
