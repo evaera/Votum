@@ -6,8 +6,11 @@ import path from "path"
 import { MotionData } from "./MotionData"
 import { MotionResolution } from "./Motion"
 import { getCouncil } from "./__mocks__/council"
+import {
+  OnFinishActions,
+} from "./CouncilData"
 
-jest.mock("./Votum", () => jest.fn().mockImplementation(() => ({})))
+jest.mock("./Votum", () => ({getCouncil: jest.fn().mockReturnValue({})}))
 
 const clearDataFolder = async () => {
   // https://stackoverflow.com/a/42182416/13152732
@@ -154,7 +157,16 @@ describe("Test Resolve", () => {
         foo.deliberationChannelId = "s"
         motion.council.setConfig("keepTranscripts", true)
         foo.active = true
-        motion.council.setConfig("onFinishActions", {failed: false, passed: false, killed: true})
+
+        const actions: OnFinishActions = {
+          killed: [
+            {
+              action: "forward",
+              to: "foo",
+            },
+          ],
+        }
+        motion.council.setConfig("onFinishActions", actions)
         motion.council.setConfig("onKilledAnnounce", "foo")
         motionResolve = MotionResolution.Killed
         motion.resolve(motionResolve)
