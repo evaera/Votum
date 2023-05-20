@@ -135,13 +135,18 @@ describe("Test Resolve", () => {
 
     test("Test actions", () =>{
         foo.active = true
-        motion.council.setConfig("onFinishActions", "forward")
+        motion.council.setConfig("onFinishActions", 
+        {
+            failed: [{action: "forward", atMajority: 1, options: undefined, to: 123}], 
+            passed: false, 
+            killed: false
+        })
         motion.council.setConfig("onFailedAnnounce", "foo")
         var motionResolve = MotionResolution.Failed
         motion.resolve(motionResolve)
 
         foo.active = true
-        motion.council.setConfig("onFinishActions", "forward")
+        motion.council.setConfig("onFinishActions", {failed: false, passed: true, killed: false})
         motion.council.setConfig("onPassedAnnounce", "foo")
         motionResolve = MotionResolution.Passed
         motion.resolve(motionResolve)
@@ -149,7 +154,7 @@ describe("Test Resolve", () => {
         foo.deliberationChannelId = "s"
         motion.council.setConfig("keepTranscripts", true)
         foo.active = true
-        motion.council.setConfig("onFinishActions", "forward")
+        motion.council.setConfig("onFinishActions", {failed: false, passed: false, killed: true})
         motion.council.setConfig("onKilledAnnounce", "foo")
         motionResolve = MotionResolution.Killed
         motion.resolve(motionResolve)
@@ -165,11 +170,78 @@ describe("Test motion votes", () =>{
         const votes = motion.getVotes()
         expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 0})
     })
-    test("Test castVote", () =>{
-        expect(1).toBe(1)
-    })
     test("Test getRemainingVoters", () =>{
-        expect(1).toBe(1)
+        const remainingVoters = motion.getRemainingVoters()
+        //users from the council mock that have not voted
+        const expected = [
+            {
+                "deleted": false, 
+                "displayName": "votum-app",
+                "guildID": 123, 
+                "joinedTimestamp": null, 
+                "lastMessageChannelID": null, 
+                "nickname": null, 
+                "premiumSinceTimestamp": null, 
+                "userID": "votum"
+            },
+            {
+                "deleted": false, 
+                "displayName": "user-foo", 
+                "guildID": 123, 
+                "joinedTimestamp": null, 
+                "lastMessageChannelID": null, 
+                "nickname": null, 
+                "premiumSinceTimestamp": null, 
+                "userID": "foo"
+            },
+            {
+                "deleted": false, 
+                "displayName": "user-bar", 
+                "guildID": 123, 
+                "joinedTimestamp": null, 
+                "lastMessageChannelID": null, 
+                "nickname": null, 
+                "premiumSinceTimestamp": null, 
+                "userID": "bar"
+            }]
+        expect(remainingVoters).toStrictEqual(expected)
     })
+    test("Test castVote", () =>{
+        motion.castVote({
+            authorId: "foo",
+            authorName: "user-foo",
+            state: 1,
+            name: "user-foo",
+            reason: "foo",
+            isDictator: false,
+        })
+        const votes = motion.getVotes()
+        expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 1})
+
+        //same voter same vote
+        motion.castVote({
+            authorId: "foo",
+            authorName: "user-foo",
+            state: 1,
+            name: "user-foo",
+            reason: "foo",
+            isDictator: false,
+        })
+        expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 1})
+
+        //dictator vote
+        foo.active = true
+        motion.castVote({
+            authorId: "foo",
+            authorName: "user-foo",
+            state: 1,
+            name: "user-foo",
+            reason: "foo",
+            isDictator: true,
+        })
+        //shouldnt dictatorVoted == true?
+        expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 1})
+    })
+
 })
 })
