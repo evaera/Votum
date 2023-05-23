@@ -218,9 +218,9 @@ describe("Test motion votes", () =>{
         expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 0})
     })
     test("Test getRemainingVoters", () =>{
-        const remainingVoters = motion.getRemainingVoters()
+        var remainingVoters = motion.getRemainingVoters()
         //users from the council mock that have not voted
-        const expected = [
+        var expected = [
             {
                 "deleted": false, 
                 "displayName": "votum-app",
@@ -251,6 +251,40 @@ describe("Test motion votes", () =>{
                 "premiumSinceTimestamp": null, 
                 "userID": "bar"
             }]
+        expect(remainingVoters.toJSON()).toStrictEqual(expected)
+        
+        motion.castVote({
+            authorId: "foo",
+            authorName: "user-foo",
+            state: 1,
+            name: "user-foo",
+            reason: "foo",
+            isDictator: false,
+        })
+
+        expected = [
+            {
+                "deleted": false, 
+                "displayName": "votum-app",
+                "guildID": 123, 
+                "joinedTimestamp": null, 
+                "lastMessageChannelID": null, 
+                "nickname": null, 
+                "premiumSinceTimestamp": null, 
+                "userID": "votum"
+            },
+            {
+                "deleted": false, 
+                "displayName": "user-bar", 
+                "guildID": 123, 
+                "joinedTimestamp": null, 
+                "lastMessageChannelID": null, 
+                "nickname": null, 
+                "premiumSinceTimestamp": null, 
+                "userID": "bar"
+            }]
+
+        remainingVoters = motion.getRemainingVoters()
         expect(remainingVoters.toJSON()).toStrictEqual(expected)
     })
     test("Test castVote", () =>{
