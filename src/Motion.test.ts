@@ -113,16 +113,16 @@ describe("Test Resolve", () => {
     test("Test MotionResolution Failed", () =>{
         foo.active = true
         motion.council.setConfig("onFailedAnnounce", "foo")
-        const motionResolve = MotionResolution.Failed
-        motion.resolve(motionResolve)
+        foo.resolution = MotionResolution.Failed
+        motion.resolve(foo.resolution)
         expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
         expect(foo.active).toBe(false)
     })
     test("Test MotionResolution Passed", () =>{
         foo.active = true
         motion.council.setConfig("onPassedAnnounce", "foo")
-        const motionResolve = MotionResolution.Passed
-        motion.resolve(motionResolve)
+        foo.resolution = MotionResolution.Passed
+        motion.resolve(foo.resolution)
         expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
         expect(foo.active).toBe(false)
     })
@@ -130,35 +130,70 @@ describe("Test Resolve", () => {
     test("Test MotionResolution Killed", () =>{
         foo.active = true
         motion.council.setConfig("onKilledAnnounce", "foo")
-        const motionResolve = MotionResolution.Killed
-        motion.resolve(motionResolve)
+        foo.resolution = MotionResolution.Killed
+        motion.resolve(foo.resolution)
         expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
         expect(foo.active).toBe(false)
     })
 
     test("Test actions", () =>{
+        var actions: OnFinishActions = {}
+        motion.council.setConfig("onFinishActions", actions)
+        foo.resolution = MotionResolution.Failed
         foo.active = true
-        motion.council.setConfig("onFinishActions", 
-        {
-            failed: [{action: "forward", atMajority: 1, options: undefined, to: 123}], 
-            passed: false, 
-            killed: false
-        })
         motion.council.setConfig("onFailedAnnounce", "foo")
-        var motionResolve = MotionResolution.Failed
-        motion.resolve(motionResolve)
-
+        motion.resolve(foo.resolution)
+        expect(foo.active).toBe(false)
+        expect(foo.didExpire).toBe(motion.isExpired)
+        
+        //Finish actions for failed
+        actions = {
+            failed: [
+                {
+                    action: "forward",
+                    to: "foo",
+                }
+            ]
+        }
         foo.active = true
-        motion.council.setConfig("onFinishActions", {failed: false, passed: true, killed: false})
-        motion.council.setConfig("onPassedAnnounce", "foo")
-        motionResolve = MotionResolution.Passed
-        motion.resolve(motionResolve)
+        motion.council.setConfig("onFinishActions", actions)
+        motion.resolve(foo.resolution)
+        expect(foo.active).toBe(false)
+        expect(foo.didExpire).toBe(motion.isExpired)
+        
+        //Finish actions for passed
+        foo.resolution = MotionResolution.Passed
+        foo.active = true
+        motion.resolve(foo.resolution)
+        expect(foo.active).toBe(false)
+        expect(foo.didExpire).toBe(motion.isExpired)
 
+        actions = {
+            passed: [
+              {
+                action: "forward",
+                to: "foo",
+              },
+            ],
+          }
+        foo.active = true
+        motion.council.setConfig("onFinishActions", actions)
+        motion.council.setConfig("onPassedAnnounce", "foo")
+        motion.resolve(foo.resolution)
+        expect(foo.active).toBe(false)
+        expect(foo.didExpire).toBe(motion.isExpired)
+        
         foo.deliberationChannelId = "s"
         motion.council.setConfig("keepTranscripts", true)
         foo.active = true
+        foo.resolution = MotionResolution.Killed
+        motion.resolve(foo.resolution)
+        expect(foo.active).toBe(false)
+        expect(foo.didExpire).toBe(motion.isExpired)
 
-        const actions: OnFinishActions = {
+        foo.active = true
+        //Finish actions for killed
+        actions = {
           killed: [
             {
               action: "forward",
@@ -168,9 +203,9 @@ describe("Test Resolve", () => {
         }
         motion.council.setConfig("onFinishActions", actions)
         motion.council.setConfig("onKilledAnnounce", "foo")
-        motionResolve = MotionResolution.Killed
-        motion.resolve(motionResolve)
+        motion.resolve(foo.resolution)
         expect(foo.active).toBe(false)
+        expect(foo.didExpire).toBe(motion.isExpired)
         expect(foo.deliberationChannelId).toBe("s")
     })
 })
