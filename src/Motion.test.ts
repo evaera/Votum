@@ -204,7 +204,7 @@ describe("Test motion votes", () =>{
                 "premiumSinceTimestamp": null, 
                 "userID": "bar"
             }]
-        expect(remainingVoters).toStrictEqual(expected)
+        expect(remainingVoters.toJSON()).toStrictEqual(expected)
     })
     test("Test castVote", () =>{
         motion.castVote({
