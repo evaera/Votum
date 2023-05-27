@@ -50,9 +50,10 @@ test("Should start a motion correctly", () => {
     expect(motion.isExpired).toBe(false)
     expect(motion.votes).toStrictEqual([])
     expect(motion.createdAt).toBe(0)
-    motion.createdAt = 1
+    motionData.createdAt = 1
     expect(motion.createdAt).toBe(1)
     expect(motion.text).toBe("")
+    motionData.resolution = MotionResolution.Unresolved
     expect(motion.resolution).toBe(MotionResolution.Unresolved)
     expect(Object.is(motion.getData(), motionData))
 })
@@ -144,18 +145,18 @@ describe("Test Resolve", () => {
         expect(motion.council.isUserOnCooldown(motionData.authorId)).toBe(false)
         expect(motionData.active).toBe(false)
     })
+    
+    var actions: OnFinishActions = {}
+    motionData.resolution = MotionResolution.Failed
+    motion.council.setConfig("onFailedAnnounce", "foo")
 
-    test("Test actions", () =>{
-        var actions: OnFinishActions = {}
+    test("Test motion failed actions without failed actions", () =>{
         motion.council.setConfig("onFinishActions", actions)
-        motionData.resolution = MotionResolution.Failed
-        motionData.active = true
-        motion.council.setConfig("onFailedAnnounce", "foo")
         motion.resolve(motionData.resolution)
         expect(motionData.active).toBe(false)
         expect(motionData.didExpire).toBe(motion.isExpired)
-        
-        //Finish actions for failed
+    })
+    test("Test motion failed actions with failed actions", () =>{
         actions = {
             failed: [
                 {
@@ -164,19 +165,21 @@ describe("Test Resolve", () => {
                 }
             ]
         }
-        motionData.active = true
         motion.council.setConfig("onFinishActions", actions)
         motion.resolve(motionData.resolution)
         expect(motionData.active).toBe(false)
         expect(motionData.didExpire).toBe(motion.isExpired)
-        
-        //Finish actions for passed
-        motionData.resolution = MotionResolution.Passed
-        motionData.active = true
+    })
+
+    motionData.resolution = MotionResolution.Passed
+    motion.council.setConfig("onPassedAnnounce", "foo")
+
+    test("Test motion passed actions without passed actions", () =>{
         motion.resolve(motionData.resolution)
         expect(motionData.active).toBe(false)
         expect(motionData.didExpire).toBe(motion.isExpired)
-
+    })
+    test("Test motion passed actions with passed actions", () =>{
         actions = {
             passed: [
               {
@@ -184,24 +187,24 @@ describe("Test Resolve", () => {
                 to: "foo",
               },
             ],
-          }
-        motionData.active = true
+        }
         motion.council.setConfig("onFinishActions", actions)
-        motion.council.setConfig("onPassedAnnounce", "foo")
         motion.resolve(motionData.resolution)
         expect(motionData.active).toBe(false)
         expect(motionData.didExpire).toBe(motion.isExpired)
-        
-        motionData.deliberationChannelId = "s"
-        motion.council.setConfig("keepTranscripts", true)
-        motionData.active = true
-        motionData.resolution = MotionResolution.Killed
-        motion.resolve(motionData.resolution)
-        expect(motionData.active).toBe(false)
-        expect(motionData.didExpire).toBe(motion.isExpired)
+    })
 
-        motionData.active = true
-        //Finish actions for killed
+    motionData.deliberationChannelId = "s"
+    motion.council.setConfig("keepTranscripts", true)
+    motionData.resolution = MotionResolution.Killed
+    motion.council.setConfig("onKilledAnnounce", "foo")
+
+    test("Test motion killed actions without killed actions", () =>{
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
+    })
+    test("Test motion killed actions with killed actions", () =>{
         actions = {
           killed: [
             {
@@ -211,7 +214,6 @@ describe("Test Resolve", () => {
           ],
         }
         motion.council.setConfig("onFinishActions", actions)
-        motion.council.setConfig("onKilledAnnounce", "foo")
         motion.resolve(motionData.resolution)
         expect(motionData.active).toBe(false)
         expect(motionData.didExpire).toBe(motion.isExpired)
