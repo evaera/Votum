@@ -28,7 +28,7 @@ describe("Motion Class Test", () => {
     afterAll(async() => {
         await clearDataFolder()
     })
-    const foo: MotionData = {
+    const motionData: MotionData = {
         authorId: "",
         authorName: "",
         active: false,
@@ -40,7 +40,7 @@ describe("Motion Class Test", () => {
     }
 test("Should start a motion correctly", () => {
     //@ts-ignore
-    const motion = new Motion(0, foo, {
+    const motion = new Motion(0, motionData, {
         //getConfig: () => 0.75
         motionExpiration: 0
     })
@@ -54,97 +54,106 @@ test("Should start a motion correctly", () => {
     expect(motion.createdAt).toBe(1)
     expect(motion.text).toBe("")
     expect(motion.resolution).toBe(MotionResolution.Unresolved)
-    expect(Object.is(motion.getData(), foo))
+    expect(Object.is(motion.getData(), motionData))
 })
 test("Test motion majorities", () => {
     //@ts-ignore
-    const motion = new Motion(0, foo, {
+    const motion = new Motion(0, motionData, {
         //getConfig: () => 0.75
         getConfig: jest.fn().mockReturnValueOnce(0.75).mockReturnValue(undefined),
     })
     expect(motion.requiredMajority).toBe(0.75)
     expect(motion.requiredMajority).toBe(0.5)
-    foo.options = {majority: 1}
+    motionData.options = {majority: 1}
     expect(motion.requiredMajority).toBe(1)
-    foo.options = undefined
+    motionData.options = undefined
 })
 describe("Test getReadableMajorities", () => {
     test("Test getReadableMajorities return Unanimous", () => {
         //@ts-ignore
-        const motion = new Motion(0, foo, {
+        const motion = new Motion(0, motionData, {
             getConfig: jest.fn().mockReturnValue(1),
         })
         expect(motion.getReadableMajority()).toBe("Unanimous")
     })
     test("Test getReadableMajorities return Simple Majority", () => {
         //@ts-ignore
-        const motion = new Motion(0, foo, {
+        const motion = new Motion(0, motionData, {
             getConfig: jest.fn().mockReturnValue(0.5),
         })
         expect(motion.getReadableMajority()).toBe("Simple majority")
     })
     test("Test getReadableMajorities return fraction of value", () => {
         //@ts-ignore
-        const motion = new Motion(0, foo, {
+        const motion = new Motion(0, motionData, {
             getConfig: jest.fn().mockReturnValue("0.75"),
         })
         expect(motion.getReadableMajority()).toBe("3/4")
     })
 })
 describe("Test Resolve", () => {
+    beforeEach(()=> {motionData.active = true})
     //@ts-ignore
-    const motion = new Motion(0, foo, getCouncil())
+    const motion = new Motion(0, motionData, getCouncil())
     test("Test Attempt to resolve a resolved motion error", () => {
+        motionData.active = false
         //@ts-ignore
         expect(() => {motion.resolve({})}).toThrow(Error)
     })
     test("Test data is active", () => {
-        foo.active = true
         //@ts-ignore
         expect(motion.resolve({})).toBe(undefined)
-        expect(foo.active).toBe(false)
-        expect(foo.resolution).toBe(foo.resolution)
-        expect(foo.didExpire).toBe(false)
+        expect(motionData.active).toBe(false)
+        expect(motionData.resolution).toBe(motionData.resolution)
+        expect(motionData.didExpire).toBe(false)
     })
     
     //mock post message to test it on another set of tests
     motion.postMessage = jest.fn()
     
+    test("Test council has an announce channel", () =>{
+        const council = getCouncil()
+        council.channel.guild.channels.cache.get = jest.fn().mockReturnValue("123")
+        const motionAnnounceChannel = new Motion(0, motionData, council)
+        motionAnnounceChannel.postMessage = jest.fn()
+        motionData.resolution = MotionResolution.Failed
+        council.setConfig("announceChannel", "123")
+        motionAnnounceChannel.resolve(motionData.resolution)
+        expect(motionAnnounceChannel.postMessage).toBeCalledWith("", "123")
+    })
+
     test("Test MotionResolution Failed", () =>{
-        foo.active = true
         motion.council.setConfig("onFailedAnnounce", "foo")
-        foo.resolution = MotionResolution.Failed
-        motion.resolve(foo.resolution)
-        expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
-        expect(foo.active).toBe(false)
+        motionData.resolution = MotionResolution.Failed
+        motion.resolve(motionData.resolution)
+        expect(motion.council.isUserOnCooldown(motionData.authorId)).toBe(false)
+        expect(motionData.active).toBe(false)
     })
     test("Test MotionResolution Passed", () =>{
-        foo.active = true
         motion.council.setConfig("onPassedAnnounce", "foo")
-        foo.resolution = MotionResolution.Passed
-        motion.resolve(foo.resolution)
-        expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
-        expect(foo.active).toBe(false)
+        motionData.resolution = MotionResolution.Passed
+        motion.resolve(motionData.resolution)
+        expect(motion.council.isUserOnCooldown(motionData.authorId)).toBe(false)
+        expect(motionData.active).toBe(false)
     })
 
     test("Test MotionResolution Killed", () =>{
-        foo.active = true
         motion.council.setConfig("onKilledAnnounce", "foo")
-        foo.resolution = MotionResolution.Killed
-        motion.resolve(foo.resolution)
-        expect(motion.council.isUserOnCooldown(foo.authorId)).toBe(false)
-        expect(foo.active).toBe(false)
+        motionData.resolution = MotionResolution.Killed
+        motion.resolve(motionData.resolution)
+        expect(motion.council.isUserOnCooldown(motionData.authorId)).toBe(false)
+        expect(motionData.active).toBe(false)
     })
 
     test("Test actions", () =>{
         var actions: OnFinishActions = {}
         motion.council.setConfig("onFinishActions", actions)
-        foo.resolution = MotionResolution.Failed
-        foo.active = true
+        motionData.resolution = MotionResolution.Failed
+        motionData.active = true
         motion.council.setConfig("onFailedAnnounce", "foo")
-        motion.resolve(foo.resolution)
-        expect(foo.active).toBe(false)
-        expect(foo.didExpire).toBe(motion.isExpired)
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
         
         //Finish actions for failed
         actions = {
@@ -155,18 +164,18 @@ describe("Test Resolve", () => {
                 }
             ]
         }
-        foo.active = true
+        motionData.active = true
         motion.council.setConfig("onFinishActions", actions)
-        motion.resolve(foo.resolution)
-        expect(foo.active).toBe(false)
-        expect(foo.didExpire).toBe(motion.isExpired)
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
         
         //Finish actions for passed
-        foo.resolution = MotionResolution.Passed
-        foo.active = true
-        motion.resolve(foo.resolution)
-        expect(foo.active).toBe(false)
-        expect(foo.didExpire).toBe(motion.isExpired)
+        motionData.resolution = MotionResolution.Passed
+        motionData.active = true
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
 
         actions = {
             passed: [
@@ -176,22 +185,22 @@ describe("Test Resolve", () => {
               },
             ],
           }
-        foo.active = true
+        motionData.active = true
         motion.council.setConfig("onFinishActions", actions)
         motion.council.setConfig("onPassedAnnounce", "foo")
-        motion.resolve(foo.resolution)
-        expect(foo.active).toBe(false)
-        expect(foo.didExpire).toBe(motion.isExpired)
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
         
-        foo.deliberationChannelId = "s"
+        motionData.deliberationChannelId = "s"
         motion.council.setConfig("keepTranscripts", true)
-        foo.active = true
-        foo.resolution = MotionResolution.Killed
-        motion.resolve(foo.resolution)
-        expect(foo.active).toBe(false)
-        expect(foo.didExpire).toBe(motion.isExpired)
+        motionData.active = true
+        motionData.resolution = MotionResolution.Killed
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
 
-        foo.active = true
+        motionData.active = true
         //Finish actions for killed
         actions = {
           killed: [
@@ -203,16 +212,16 @@ describe("Test Resolve", () => {
         }
         motion.council.setConfig("onFinishActions", actions)
         motion.council.setConfig("onKilledAnnounce", "foo")
-        motion.resolve(foo.resolution)
-        expect(foo.active).toBe(false)
-        expect(foo.didExpire).toBe(motion.isExpired)
-        expect(foo.deliberationChannelId).toBe("s")
+        motion.resolve(motionData.resolution)
+        expect(motionData.active).toBe(false)
+        expect(motionData.didExpire).toBe(motion.isExpired)
+        expect(motionData.deliberationChannelId).toBe("s")
     })
 })
 
 describe("Test motion votes", () =>{
     //@ts-ignore
-    const motion = new Motion(0, foo, getCouncil())
+    const motion = new Motion(0, motionData, getCouncil())
     test("Test getVotes", () =>{
         const votes = motion.getVotes()
         expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 0})
@@ -311,7 +320,7 @@ describe("Test motion votes", () =>{
         expect(votes).toStrictEqual({"abs": 0, "dictatorVoted": false, "no": 0, "toPass": 2, "yes": 1})
 
         //dictator vote
-        foo.active = true
+        motionData.active = true
         motion.castVote({
             authorId: "foo",
             authorName: "user-foo",
