@@ -1,23 +1,8 @@
 import { Message } from "discord.js"
-import { CommandoClient, CommandoMessage } from "discord.js-commando"
-import {
-  ConfigurableCouncilData,
-  ConfigurableCouncilDataSerializers,
-  OptionalCouncilData
-} from "../../CouncilData"
-import {
-  getDefaultValue,
-  getProps,
-  parseType,
-  response,
-  ResponseType
-} from "../../Util"
-import Command from "../Command"
-
-interface ConfigArguments {
-  key: string
-  value: string
-}
+import { Args, PieceContext } from "@sapphire/framework"
+import { ConfigurableCouncilData, ConfigurableCouncilDataSerializers, OptionalCouncilData } from "../../CouncilData"
+import { getDefaultValue, getProps, response, ResponseType } from "../../Util"
+import ICommand from "../ICommand"
 
 const makeDisplay = (displayer?: (value: any) => string) => (value: any) => {
   if (value === undefined || value === null) {
@@ -29,106 +14,100 @@ const makeDisplay = (displayer?: (value: any) => string) => (value: any) => {
   }
 }
 
-export default class ConfigCommand extends Command {
-  constructor(client: CommandoClient) {
+export default class ConfigCommand extends ICommand {
+  constructor(client: PieceContext) {
     super(client, {
       name: "config",
       aliases: ["votumconfig", "cfg", "vconfig", "vcfg", "councilconfig"],
       description: "Designates a specific role for councilors.",
       adminOnly: true,
-
-      args: [
-        {
-          key: "key",
-          prompt: "Which configuration point would you like to change?",
-          type: "string",
-          default: "",
-        },
-        {
-          key: "value",
-          prompt:
-            "What value would you like to set this configuration point to?",
-          type: "string",
-          default: "",
-        },
-      ],
+      quotes: []
     })
   }
 
-  async execute(
-    msg: CommandoMessage,
-    args: ConfigArguments
-  ): Promise<Message | Message[]> {
-    if (args.key.length === 0) {
-      return msg.reply(
-        response(
+  async execute(msg: Message, args: Args): Promise<Message | Message[]> {
+    const argsKey = args.next();
+    args.save()
+    const argsValue = args.next();
+    let value
+
+    if (argsKey == null || argsKey.length === 0) {
+      return msg.reply({
+        embeds: [response(
           ResponseType.Neutral,
           `Available configuration points are:\n${Object.keys(
-            getProps(ConfigurableCouncilData)
+            getProps(ConfigurableCouncilData),
           )
             .map((n) => `~${n}~`)
-            .join(",\n ")}.`
-        )
-      )
+            .join(",\n ")}.`,
+        ).embed],
+      })
     }
 
-    const key = args.key.replace(/\.([a-z0-9])/g, (_, l) =>
-      l.toUpperCase()
+    const key = argsKey.replace(/\.([a-z0-9])/g, (_, l) =>
+      l.toUpperCase(),
     ) as keyof ConfigurableCouncilData
 
     if (!(key in getProps(ConfigurableCouncilData))) {
-      return msg.reply(
-        response(
+      return msg.reply({
+        embeds: [response(
           ResponseType.Bad,
-          `:x: \`${key}\` is not a valid configuration point.`
-        )
-      )
+          `:x: \`${key}\` is not a valid configuration point.`,
+        ).embed],
+      })
     }
 
     const serializer = ConfigurableCouncilDataSerializers[key]
     const display = makeDisplay(serializer.display)
 
-    if (args.value.length === 0) {
-      return msg.reply(
-        response(
+    if (argsValue == null || argsValue.length === 0) {
+      return msg.reply({
+        embeds: [response(
           ResponseType.Neutral,
-          `Configuration point ${args.key} is currently set to ~${display(
-            this.council.getConfig(key)
-          )}~.`
-        )
-      )
+          `Configuration point ${argsKey} is currently set to ${display(
+            this.council.getConfig(key),
+          )}`,
+        ).embed],
+      })
     }
 
-    if (args.value === "$remove" && key in getProps(OptionalCouncilData)) {
+    if (argsValue === "$remove" && key in getProps(OptionalCouncilData)) {
       this.council.setConfig(key, getDefaultValue(key, OptionalCouncilData))
-      return msg.reply(
-        response(
+      return msg.reply({
+        embeds: [response(
           ResponseType.Neutral,
-          `Set configuration point ~${key}~ back to default state.`
-        )
-      )
+          `Set configuration point ~${key}~ back to default state.`,
+        ).embed],
+      })
     }
 
-    const value = await parseType(this.client, msg, args.value, serializer)
+    const valueType = (serializer.type as any)
+    try {
+      args.restore()
+      value = await args.rest(valueType)
+    } catch (e) {
+      value = null
+    }
+
 
     if (value !== null) {
       const serializedValue = serializer.serialize(value)
 
       this.council.setConfig(key, serializedValue)
 
-      return msg.reply(
-        response(
+      return msg.reply({
+        embeds: [response(
           ResponseType.Good,
-          `Set configuration point ~${key}~ to ${display(value)}`
-        )
-      )
+          `Set configuration point ~${key}~ to ${display(value)}`,
+        ).embed],
+      })
     } else {
-      return msg.reply(
-        response(
+      return msg.reply({
+        embeds: [response(
           ResponseType.Bad,
-          `~${args.value}~ is not a valid **${serializer.type}**`
-        )
-      )
+          `~${argsValue}~ is not a valid **${serializer.type}**`,
+        ).embed],
+      })
     }
   }
 }
