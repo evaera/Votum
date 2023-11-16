@@ -1,9 +1,8 @@
-import { Message } from "discord.js"
-import { CommandoMessage } from "discord.js-commando"
 import { CouncilData } from "../../CouncilData"
 import { CastVoteStatus } from "../../Motion"
-import Votum from "../../Votum"
-import Command from "../Command"
+import ICommand from "../ICommand"
+import { Message } from "discord.js"
+import { container } from "@sapphire/framework"
 
 const reasonRequiredMap: { [index: string]: keyof CouncilData } = {
   abstain: "reasonRequiredAbstain",
@@ -11,24 +10,26 @@ const reasonRequiredMap: { [index: string]: keyof CouncilData } = {
   no: "reasonRequiredNo",
 }
 
-export default class VoteAliasCommand extends Command {
+export default class VoteAliasCommand extends ICommand {
   protected state: 1 | 0 | -1
 
-  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
+  async execute(msg: Message): Promise<Message | Message[]> {
+    let args = msg.toString().split(" ").slice(1).join(" ")
+
     if (!this.council.currentMotion) {
       return msg.reply("There is no motion active.")
     }
 
     if (
-      !args.reason &&
-      this.council.getConfig(reasonRequiredMap[msg.command.name])
+      !args &&
+      this.council.getConfig(reasonRequiredMap[this.name])
     ) {
       return msg.reply("You must provide a reason with your vote.")
     }
 
-    if (args.reason.length > 1000) {
+    if (args.length > 1000) {
       return msg.reply(
-        "Your reason is too long. The maximum length is 1000 characters."
+        "Your reason is too long. The maximum length is 1000 characters.",
       )
     }
 
@@ -36,12 +37,14 @@ export default class VoteAliasCommand extends Command {
 
     const voteStatus = motion.castVote({
       authorId: msg.author.id,
+      // @ts-ignore
       authorName: msg.member.displayName,
       name: this.getVoteName(msg),
       state: this.state,
-      reason: args.reason,
+      reason: args,
       isDictator: this.council.getConfig("dictatorRole")
-        ? msg.member.roles.cache.has(this.council.getConfig("dictatorRole")!)
+        ? // @ts-ignore
+        msg.member.roles.cache.has(this.council.getConfig("dictatorRole")!)
         : false,
     })
 
@@ -50,17 +53,17 @@ export default class VoteAliasCommand extends Command {
         return motion.postMessage()
       case CastVoteStatus.Changed:
         return motion.postMessage(
-          `${msg.member} changed their vote to ${this.getVoteName(msg)}.`
+          `${msg.member} changed their vote to ${this.getVoteName(msg)}.`,
         )
       case CastVoteStatus.Failed:
         return msg.reply("You can't vote on this motion.")
     }
   }
 
-  private getVoteName(msg: CommandoMessage) {
-    let name = msg.command.name
+  private getVoteName(msg: Message) {
+    let name = msg.toString().split(" ").slice(0, 1).join()
 
-    if (msg.cleanContent.substring(0, 1) === Votum.bot.commandPrefix) {
+    if (msg.cleanContent.startsWith(<string>container.client.fetchPrefix(msg))) {
       name = msg.cleanContent.split(" ")[0].slice(1)
     }
 
