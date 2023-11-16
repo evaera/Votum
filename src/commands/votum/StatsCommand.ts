@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
-import { CommandoClient, CommandoMessage } from "discord.js-commando"
-import { MotionResolution } from "../../Motion"
-import Command from "../Command"
+import { PieceContext } from "@sapphire/framework"
+import Motion, { MotionResolution } from "../../Motion"
+import ICommand from "../ICommand"
 
 interface TimeStat {
   authorId: string
@@ -40,17 +40,18 @@ function timeSince(date: number, zeroReplacement?: string) {
   return Math.floor(seconds) + " seconds ago"
 }
 
-export default class StatsCommand extends Command {
-  constructor(client: CommandoClient) {
+export default class StatsCommand extends ICommand {
+  constructor(client: PieceContext) {
     super(client, {
       name: "councilstats",
       aliases: ["votestats", "votumstats"],
       description: "Show some stats about the past votes in your council.",
-      adminOnly: true,
+      adminOnly: true
     })
   }
 
-  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
+  async execute(msg: Message): Promise<Message | Message[]> {
+    // @ts-ignore
     await msg.guild.members.fetch() // Privileged intents fix
     const lastVoted: { [index: string]: number } = {}
     const lastMotion: { [index: string]: number } = {}
@@ -70,44 +71,14 @@ export default class StatsCommand extends Command {
 
     for (let i = 0; i < this.council.numMotions; i++) {
       const motion = this.council.getMotion(i)
-
-      if (
-        lastMotion[motion.authorId] == null ||
-        lastMotion[motion.authorId] < motion.createdAt
-      ) {
-        lastMotion[motion.authorId] = motion.createdAt
-
-        if (councilorNames[motion.authorId] == null) {
-          councilorNames[motion.authorId] = motion.authorName + " (retired)"
-        }
-      }
-
-      if (mostMotions[motion.authorId] == null) mostMotions[motion.authorId] = 0
-      mostMotions[motion.authorId]++
-
-      if (motion.resolution === MotionResolution.Passed) {
-        if (mostPassedMotions[motion.authorId] == null)
-          mostPassedMotions[motion.authorId] = 0
-        mostPassedMotions[motion.authorId]++
-      }
-
-      for (const vote of motion.votes) {
-        // If this is a quoted vote
-        if (vote.authorId === "0") {
-          continue
-        }
-
-        if (
-          lastVoted[vote.authorId] == null ||
-          lastVoted[vote.authorId] < motion.createdAt
-        ) {
-          lastVoted[vote.authorId] = motion.createdAt
-
-          if (councilorNames[vote.authorId] == null) {
-            councilorNames[vote.authorId] = vote.authorName + " (retired)"
-          }
-        }
-      }
+      this.extractMotionInformation(
+        motion,
+        lastVoted,
+        lastMotion,
+        mostMotions,
+        mostPassedMotions,
+        councilorNames
+      )
     }
 
     /////////////////////////////////////////////////////////
@@ -185,6 +156,61 @@ export default class StatsCommand extends Command {
 
     /////////////////////////////////////////////////////////
 
-    return msg.reply(output, { split: true })
+    return msg.reply(output)
+  }
+
+  extractMotionInformation(
+    motion: Motion,
+    lastVoted: any,
+    lastMotion: any,
+    mostMotions: any,
+    mostPassedMotions: any,
+    councilorNames: any
+  ): void {
+    if (
+      lastMotion[motion.authorId] == null ||
+      lastMotion[motion.authorId] < motion.createdAt
+    ) {
+      lastMotion[motion.authorId] = motion.createdAt
+      this.addRetiredCouncilor(
+        councilorNames,
+        motion.authorId,
+        motion.authorName
+      )
+    }
+
+    if (mostMotions[motion.authorId] == null) mostMotions[motion.authorId] = 0
+    mostMotions[motion.authorId]++
+
+    if (motion.resolution === MotionResolution.Passed) {
+      if (mostPassedMotions[motion.authorId] == null)
+        mostPassedMotions[motion.authorId] = 0
+      mostPassedMotions[motion.authorId]++
+    }
+
+    for (const vote of motion.votes) {
+      // If this is a quoted vote
+      if (vote.authorId === "0") {
+        continue
+      }
+
+      if (
+        lastVoted[vote.authorId] == null ||
+        lastVoted[vote.authorId] < motion.createdAt
+      ) {
+        lastVoted[vote.authorId] = motion.createdAt
+        this.addRetiredCouncilor(councilorNames, vote.authorId, vote.authorName)
+      }
+    }
+  }
+
+  addRetiredCouncilor(
+    councilorNames: any,
+    authorId: string,
+    authorName: string
+  ): void {
+    if (councilorNames[authorId] == null) {
+      councilorNames[authorId] = authorName + " (retired)"
+    }
   }
 }
