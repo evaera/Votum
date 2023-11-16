@@ -1,5 +1,5 @@
-import { Message } from "discord.js"
-import * as Commando from "discord.js-commando"
+import { Message, PermissionsBitField } from "discord.js"
+import { Command, CommandOptions, PieceContext } from "@sapphire/framework"
 import Council from "../Council"
 import { CouncilData } from "../CouncilData"
 import Votum from "../Votum"
@@ -11,26 +11,21 @@ interface CustomCommandInfo {
   councilOnly?: boolean
   adminOnly?: boolean
   adminsAlwaysAllowed?: boolean
-  args?: Commando.ArgumentInfo[]
   allowWithConfigurableRoles?: Array<keyof CouncilData>
+  quotes?: Array<string[]>
 }
 
-export default class Command extends Commando.Command {
+export default class ICommand extends Command {
   public councilOnly: boolean
   public adminOnly: boolean
   public adminsAlwaysAllowed: boolean
   protected council: Council
   private customInfo: CustomCommandInfo
 
-  constructor(client: Commando.CommandoClient, customInfo: CustomCommandInfo) {
-    const info = customInfo as Commando.CommandInfo
+  constructor(client: PieceContext, customInfo: CustomCommandInfo) {
+    const info = customInfo as CommandOptions
 
-    info.group = "votum"
-    info.guildOnly = true
-    info.memberName = info.name
-    info.argsPromptLimit = 0
-
-    super(client, info)
+    super(client, info);
 
     this.customInfo = customInfo
 
@@ -44,16 +39,16 @@ export default class Command extends Commando.Command {
     this.adminsAlwaysAllowed = !!customInfo.adminsAlwaysAllowed
   }
 
-  public hasPermission(msg: Commando.CommandoMessage): boolean {
+  public hasPermission(msg: Message): boolean {
     const council = Votum.getCouncil(msg.channel.id)
 
-    if (this.client.isOwner(msg.author)) {
+    if (msg.author.id === process.env.OWNER) {
       return true
     }
 
     const isAdmin =
-      msg.member.hasPermission("MANAGE_GUILD") ||
-      !!msg.member.roles.cache.find((role) => role.name === "Votum Admin")
+      msg.member?.permissions.has(PermissionsBitField.Flags.ManageGuild) ||
+      !!msg.member?.roles.cache.find((role) => role.name === "Votum Admin")
 
     if (this.adminOnly) {
       return isAdmin
@@ -65,46 +60,39 @@ export default class Command extends Commando.Command {
       this.customInfo.allowWithConfigurableRoles.find(
         (configName) =>
           council.getConfig(configName) &&
-          msg.member.roles.cache.has(council.getConfig(configName) as string)
+          msg.member?.roles.cache.has(council.getConfig(configName) as string)
       )
     ) {
       return true
     } else if (council.councilorRole != null) {
+      // @ts-ignore
       return msg.member.roles.cache.has(council.councilorRole)
     }
-
     return true
   }
 
-  public async execute(
-    msg: Commando.CommandoMessage,
-    args: any,
-    fromPattern?: boolean
-  ): Promise<Message | Message[] | undefined> {
+  public async execute(msg: Message, args?: any): Promise<Message | Message[] | undefined> {
     return msg.reply("This command has no implementation.")
   }
 
-  public async run(
-    msg: Commando.CommandoMessage,
-    args: any,
-    fromPattern?: boolean
-  ): Promise<Message | Message[]> {
-    try {
-      this.council = Votum.getCouncil(msg.channel.id)
+  public async messageRun(msg: Message, args: any): Promise<Message | Message[]> {
+    if (this.hasPermission(msg)) {
+      try {
+        this.council = Votum.getCouncil(msg.channel.id)
+        await this.council.initialize()
+        const reply = this.execute(msg, args)
 
-      await this.council.initialize()
+        if (reply == null) {
+          return msg.reply("Command executed.")
+        }
 
-      const reply = this.execute(msg, args, fromPattern)
-
-      if (reply == null) {
-        return msg.reply("Command executed.")
+        return reply as Promise<Message | Message[]>
+      } catch (e) {
+        console.error(e)
+        return msg.reply("Sorry, an error occurred executing the command.")
       }
-
-      return reply as Promise<Message | Message[]>
-    } catch (e) {
-      console.error(e)
-
-      return msg.reply("Sorry, an error occurred executing the command.")
+    } else {
+      return msg.reply(`You do not have permission to use the \`${this.name}\` command.`)
     }
   }
 }
