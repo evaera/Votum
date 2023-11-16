@@ -101,10 +101,10 @@ export default class Council {
 
   private performAutomaticBackup() {
     this.channel.send({
-      embed: response(
+      embeds: [response(
         ResponseType.Good,
         "↑ Automatically backed up council data. ↑"
-      ).embed,
+      ).embed],
       files: [
         {
           name: `${this.name}-${new Date().toISOString()}.json`,

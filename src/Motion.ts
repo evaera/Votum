@@ -1,11 +1,4 @@
-import {
-  Channel,
-  Collection,
-  GuildMember,
-  Message,
-  Snowflake,
-  TextChannel,
-} from "discord.js"
+import { ChannelType, Collection, GuildMember, Message, Snowflake, TextChannel, } from "discord.js"
 import { Either } from "fp-ts/lib/Either"
 import * as t from "io-ts"
 import minimist from "minimist"
@@ -13,14 +6,9 @@ import num2fraction from "num2fraction"
 import calculateVoteTotals from "./calculateVoteTotals"
 import Council, { CouncilWeights } from "./Council"
 import { OnFinishAction } from "./CouncilData"
-import {
-  MotionData,
-  MotionMetaOptions,
-  MotionOptions,
-  MotionVote,
-} from "./MotionData"
-import { forwardMotion } from "./Util"
-import Votum from "./Votum"
+import { MotionData, MotionMetaOptions, MotionOptions, MotionVote, } from "./MotionData"
+import { buildPieChartWithResults, forwardMotion } from "./Util"
+import { container } from "@sapphire/framework"
 
 export enum LegacyMotionVoteType {
   Majority,
@@ -64,7 +52,7 @@ export default class Motion {
       MotionMetaOptions & { [K in keyof MotionOptions]: string }
     >(input.split(" "), {
       stopEarly: true,
-      boolean: ["unanimous"],
+      boolean: ["unanimous", "showChart"],
       alias: {
         u: "unanimous",
         m: "majority",
@@ -180,9 +168,12 @@ export default class Motion {
         }),
       })
 
-      const batch = collection.array()
+      const batch = collection.values()
 
-      for (const message of batch) {
+      // Convert the IterableIterator to an array
+      const batchArray = Array.from(batch)
+
+      for (const message of batchArray) {
         if (message.author.bot) {
           continue
         }
@@ -194,11 +185,11 @@ export default class Motion {
         )
       }
 
-      if (batch.length < 50) {
+      if (batchArray.length < 50) {
         break
       }
 
-      lastId = batch[batch.length - 1].id
+      lastId = batchArray[batchArray.length - 1].id
     }
 
     messages.reverse()
@@ -240,7 +231,7 @@ export default class Motion {
         ) as TextChannel) || postChannel
     }
 
-    postChannel.send("", {
+    postChannel.send({
       files: [
         {
           name: `${this.council.name}-motion-${this.number}-transcript.txt`,
@@ -284,14 +275,15 @@ export default class Motion {
     }
 
     const guild = this.council.channel.guild
+    const categoryId = this.council.channel.parent?.id
 
     const channelName = `motion-${this.number}`
 
-    const channelPromise = guild.channels.create(channelName, {
-      type: "text",
-      parent: this.council.channel.parent as Channel,
-
-      permissionOverwrites: this.council.channel.permissionOverwrites,
+    const channelPromise = guild.channels.create({
+      name: channelName,
+      type: ChannelType.GuildText,
+      parent: categoryId,
+      permissionOverwrites: Array.from(this.council.channel.permissionOverwrites.cache.values()),
     })
 
     channelPromise.catch(console.error)
@@ -326,7 +318,7 @@ export default class Motion {
     let author
 
     try {
-      author = await Votum.bot.users.fetch(this.data.authorId)
+      author = await container.client.users.fetch(this.data.authorId)
     } catch (e) {
       // do nothing
     }
@@ -335,27 +327,15 @@ export default class Motion {
       this.checkVotes()
     }
 
-    let type = ""
-    if (this.data.voteType === LegacyMotionVoteType.Unanimous) {
-      type = " (unanimous)"
-    }
+    let title = this.defineMotionMessageTitle(text);
 
-    let title = `#${this.number} | `
-    if (this.data.active) {
-      if (text === true) {
-        title += "New motion proposed" + type
-      } else {
-        title += "Currently active motion" + type
-      }
-    } else if (this.data.resolution === MotionResolution.Passed) {
-      title += "Motion Passed" + type
-    } else if (this.data.resolution === MotionResolution.Killed) {
-      title += "Motion Killed"
-    } else {
-      title += "Motion Failed"
+    let chartUrl = null;
+    if (!this.data.active && this.data.options?.showChart) {
+      chartUrl = buildPieChartWithResults(this.getVotes())
     }
 
     const votes = text === true ? "" : "\n\n" + this.getVotesAsEmoji()
+    const inactiveMotionColor = this.data.resolution === MotionResolution.Passed ? 0x2ecc71 : 0x636e72
 
     let embeds: any[] = [
       {
@@ -367,9 +347,7 @@ export default class Motion {
         },
         color: this.data.active
           ? 0x3498db
-          : this.data.resolution === MotionResolution.Passed
-          ? 0x2ecc71
-          : 0x636e72,
+          : inactiveMotionColor,
         fields: this.getVotesAsFields(),
         footer: {
           text: this.getVoteHint(),
@@ -379,44 +357,21 @@ export default class Motion {
             this.getReadableMajority()
           )}&txtclr=3498db&txtsize=20&h=50&txtfont=Georgia`,
         },
+        image: { url: chartUrl }
       },
     ]
 
-    const isInvalid = (embed: any, extra = 0) =>
-      embed.fields.length > 25 || getEmbedLength(embed) + extra >= 6000
+    this.fixInvalidEmbedMessage(embeds, title);
 
-    let currentIndex = 1
-    while (isInvalid(embeds[0])) {
-      const field = embeds[0].fields.pop()
+    const getText = (str: any) => { return str === true ? this.council.mentionString : str }
 
-      if (
-        embeds[currentIndex] != null &&
-        isInvalid(embeds[currentIndex], getEmbedLength(field))
-      ) {
-        currentIndex++
-      }
-
-      if (embeds[currentIndex] == null) {
-        embeds[currentIndex] = {
-          title: `${title} (cont.)`,
-          color: embeds[0].color,
-          fields: [],
-        }
-      }
-
-      embeds[currentIndex].fields.push(field)
-    }
-
-    return embeds.map((embed) =>
-      (channel || this.council.channel).send(
-        typeof text !== "undefined"
-          ? text === true
-            ? this.council.mentionString
-            : text
-          : "",
-        { embed }
-      )
-    )[0]
+    return embeds.map((embed) => {
+      const options = {
+        content: typeof text !== "undefined" ? getText(text) : "",
+        embeds: [embed],
+      };
+      return (channel || this.council.channel).send(options);
+    })[0];
   }
 
   public castVote(newVote: MotionVote): CastVoteStatus {
@@ -532,21 +487,7 @@ export default class Motion {
     }
 
     this.deleteDeliberationChannel()
-
-    const actions = this.council.getConfig("onFinishActions") as any
-    if (!actions) return
-
-    switch (resolution) {
-      case MotionResolution.Failed:
-        if (actions.failed) this.performFinishActions(actions.failed)
-        break
-      case MotionResolution.Passed:
-        if (actions.passed) this.performFinishActions(actions.passed)
-        break
-      case MotionResolution.Killed:
-        if (actions.killed) this.performFinishActions(actions.killed)
-        break
-    }
+    this.finishResolvedMotion(resolution)
   }
 
   public getRemainingVoters(): Collection<string, GuildMember> {
@@ -581,7 +522,7 @@ export default class Motion {
     if (
       this.council.getConfig("majorityReachedEnds") ||
       [...this.data.votes].filter((vote) => vote.state !== undefined).length ===
-        this.council.size
+      this.council.size
     ) {
       if (votes.yes >= votes.toPass) {
         // Reached majority
@@ -606,21 +547,14 @@ export default class Motion {
     const votes = this.getVotes()
 
     if (this.data.active === false) {
-      return (
-        `Results final.` +
-        (this.data.voteType === LegacyMotionVoteType.Unanimous
-          ? " (Unanimous vote was required)"
-          : "") +
-        (this.data.didExpire ? " (Motion expired.)" : "") +
-        (votes.dictatorVoted ? " (Dictator ended vote immediately)" : "")
-      )
+      return this.getVoteResult();
     }
 
     if (votes.yes === votes.no && this.isExpired) {
       return `The motion is expired, but is tied. The next vote will close the motion.`
     } else if (votes.yes === 0 && votes.no === 0) {
       return `This motion requires ${votes.toPass} vote${
-        votes.toPass === 1 ? "" : "s"
+        this.checkPluralVotes(votes.toPass, 0)
       } to pass or fail.`
     } else if (
       (votes.yes >= votes.no && votes.yes >= votes.toPass) ||
@@ -629,15 +563,31 @@ export default class Motion {
       return `This motion has reached the required majority, but is being held until all councilors have voted.`
     } else if (votes.yes >= votes.no) {
       return `With ${votes.toPass - votes.yes} more vote${
-        votes.toPass - votes.yes === 1 ? "" : "s"
+        this.checkPluralVotes(votes.toPass, votes.yes)
       } for this motion, it will pass.`
     } else if (votes.no > votes.yes) {
       return `With ${votes.toPass - votes.no} more vote${
-        votes.toPass - votes.no === 1 ? "" : "s"
+        this.checkPluralVotes(votes.toPass, votes.no)
       } against this motion, it will fail.`
     }
 
     return `This motion requires ${votes.toPass} votes to pass or fail.`
+  }
+
+  private checkPluralVotes(pass: number, quantity: number): string {
+    return pass - quantity === 1 ? "" : "s"
+  }
+
+  private getVoteResult(): string {
+    const votes = this.getVotes()
+    return (
+      `Results final.` +
+      (this.data.voteType === LegacyMotionVoteType.Unanimous
+        ? " (Unanimous vote was required)"
+        : "") +
+      (this.data.didExpire ? " (Motion expired.)" : "") +
+      (votes.dictatorVoted ? " (Dictator ended vote immediately)" : "")
+    )
   }
 
   private getVotesAsEmoji(): string {
@@ -661,6 +611,23 @@ export default class Motion {
     return fields
   }
 
+  private finishResolvedMotion(resolution: MotionResolution): void {
+    const actions = this.council.getConfig("onFinishActions") as any
+    if (!actions) return
+
+    switch (resolution) {
+      case MotionResolution.Failed:
+        if (actions.failed) this.performFinishActions(actions.failed)
+        break
+      case MotionResolution.Passed:
+        if (actions.passed) this.performFinishActions(actions.passed)
+        break
+      case MotionResolution.Killed:
+        if (actions.killed) this.performFinishActions(actions.killed)
+        break
+    }
+  }
+
   private performFinishActions(actions: OnFinishAction[]) {
     actions = JSON.parse(JSON.stringify(actions))
     return Promise.all(
@@ -671,11 +638,61 @@ export default class Motion {
             Math.abs(action.atMajority - this.requiredMajority) < 0.01
         )
         .map((action) => {
-          switch (action.action) {
-            case "forward":
-              return forwardMotion(this, action.to, action.options)
+          if (action.action === "forward") {
+            return forwardMotion(this, action.to, action.options)
           }
         })
     )
+  }
+
+  private defineMotionMessageTitle(text?: string | true): string {
+    let type = ""
+    if (this.data.voteType === LegacyMotionVoteType.Unanimous) {
+      type = " (unanimous)"
+    }
+
+    let title = `#${this.number} | `
+    if (this.data.active) {
+      if (text === true) {
+        title += "New motion proposed" + type
+      } else {
+        title += "Currently active motion" + type
+      }
+    } else if (this.data.resolution === MotionResolution.Passed) {
+      title += "Motion Passed" + type
+    } else if (this.data.resolution === MotionResolution.Killed) {
+      title += "Motion Killed"
+    } else {
+      title += "Motion Failed"
+    }
+
+    return title;
+  }
+
+  private fixInvalidEmbedMessage(embeds: any[], title: string) {
+    const isInvalid = (embed: any, extra = 0) =>
+      embed.fields.length > 25 || getEmbedLength(embed) + extra >= 6000
+
+    let currentIndex = 1
+    while (isInvalid(embeds[0])) {
+      const field = embeds[0].fields.pop()
+
+      if (
+        embeds[currentIndex] != null &&
+        isInvalid(embeds[currentIndex], getEmbedLength(field))
+      ) {
+        currentIndex++
+      }
+
+      if (embeds[currentIndex] == null) {
+        embeds[currentIndex] = {
+          title: `${title} (cont.)`,
+          color: embeds[0].color,
+          fields: [],
+        }
+      }
+
+      embeds[currentIndex].fields.push(field)
+    }
   }
 }

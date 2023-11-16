@@ -1,4 +1,3 @@
-import { ArgumentInfo } from "discord.js-commando"
 import * as t from "io-ts"
 import { MotionData, MotionMajorityType } from "./MotionData"
 import { betweenRange, withDefault } from "./Util"
@@ -68,7 +67,7 @@ export const ConfigurableCouncilData = t.exact(
 
 export type ConfigurableCouncilData = t.TypeOf<typeof ConfigurableCouncilData>
 
-interface Serializer<T> extends Partial<ArgumentInfo> {
+interface Serializer<T> extends Partial<any> {
   serialize(value: any): T
   transform?(value: any): any
   display?(value: any): any
@@ -110,37 +109,37 @@ export const ConfigurableCouncilDataSerializers: {
     serialize: getId,
   },
   announceChannel: {
-    type: "channel",
+    type: "guildChannel",
     serialize: getId,
   },
   onPassedAnnounce: {
-    type: "channel",
+    type: "guildChannel",
     serialize: getId,
   },
   onFailedAnnounce: {
-    type: "channel",
+    type: "guildChannel",
     serialize: getId,
   },
   onKilledAnnounce: {
-    type: "channel",
+    type: "guildChannel",
     serialize: getId,
   },
   onFinishActions: {
-    type: "finish-action",
+    type: "FinishAction",
     serialize: t.identity,
-    display: (x) => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
+    display: (x) => `\`\`\`json\n${JSON.stringify(x, undefined, 1)}\`\`\``,
   },
   voteWeights: {
-    type: "weights",
+    type: "WeightType",
     serialize: t.identity,
-    display: (x) => `~~json\n${JSON.stringify(x, undefined, 1)}~~`,
+    display: (x) => `\`\`\`\n${JSON.stringify(x, undefined, 1)}\`\`\``,
   },
   councilorMotionDisable: {
     type: "boolean",
     serialize: t.identity,
   },
   majorityDefault: {
-    type: "majority-type",
+    type: "MajorityType",
     serialize: t.identity,
     display: percentDisplay,
   },

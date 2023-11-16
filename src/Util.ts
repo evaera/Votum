@@ -1,15 +1,11 @@
-import {
-  ArgumentCollector,
-  ArgumentInfo,
-  CommandoClient,
-  CommandoMessage,
-} from "discord.js-commando"
 import { Either } from "fp-ts/lib/Either"
 import * as t from "io-ts"
 import Motion, { MotionResolution } from "./Motion"
 import Votum from "./Votum"
 
 export type ExtractRight<T> = T extends Either<infer L, infer R> ? R : never
+
+export const MAX_MESSAGE_SIZE = 2000
 
 export function withDefault<T extends t.Any>(
   type: T,
@@ -18,7 +14,7 @@ export function withDefault<T extends t.Any>(
   return new t.Type(
     `withDefault(${type.name}, ${JSON.stringify(defaultValue)})`,
     type.is,
-    (v, c) => type.validate(v != null ? v : defaultValue, c),
+    (v, c) => type.validate(v ?? defaultValue, c),
     type.encode
   )
 }
@@ -66,35 +62,6 @@ export function getDefaultValue(
   type: t.HasProps | t.ExactType<t.HasProps>
 ) {
   return getProps(type)[name].decode(undefined).getOrElse(undefined)
-}
-
-export async function parseType(
-  client: CommandoClient,
-  message: CommandoMessage,
-  value: string,
-  info: Partial<ArgumentInfo> & { transform?(value: any): any }
-) {
-  const collector = new ArgumentCollector(client, [
-    {
-      key: "value",
-      prompt: "value",
-      ...info,
-    },
-  ])
-
-  const result = await collector.obtain(message, [value], 5)
-
-  if ((result.values as object | null) === null) {
-    return null
-  }
-
-  let parsedValue = (result.values as any).value as unknown
-
-  if (info.transform) {
-    parsedValue = info.transform(parsedValue)
-  }
-
-  return parsedValue as Object
 }
 
 export enum ResponseType {
@@ -150,7 +117,8 @@ export async function forwardMotion(
 
   motionData.votes.forEach((vote: any) => {
     vote.state = undefined
-    ;(vote.authorId = "0"), (vote.authorName = `»${vote.authorName}`)
+    vote.authorId = "0"
+    vote.authorName = `»${vote.authorName}`
   })
   motionData.resolution = MotionResolution.Unresolved
   motionData.active = true
@@ -163,4 +131,25 @@ export async function forwardMotion(
   if (!existingMotion) {
     await newMotion.postMessage(true)
   }
+}
+
+export function buildPieChartWithResults(
+  motionVotes: any,
+) : string {
+  const chartConfig = {
+    type: "pie",
+    data: {
+      labels: ["For", "Against", "Abstain"],
+      datasets: [{
+        label: "Votes",
+        data: [motionVotes.yes, motionVotes.no, motionVotes.abs],
+        backgroundColor: [
+          `#${ResponseType.Good.toString(16)}`,
+          `#${ResponseType.Bad.toString(16)}`,
+          `#${ResponseType.Neutral.toString(16)}`],
+      }],
+    }
+  }
+  const encodedChart = encodeURIComponent(JSON.stringify(chartConfig))
+  return `https://quickchart.io/chart?c=${encodedChart}`
 }

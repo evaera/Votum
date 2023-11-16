@@ -1,22 +1,19 @@
 {
-	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es2018",
-		"noImplicitAny": true,
-		"strictNullChecks": true,
-		"noUnusedLocals": true,
-		"moduleResolution": "node",
-		"sourceMap": true,
-		"outDir": "dist",
-		"resolveJsonModule": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"lib": [
-			"es2015",
-			"es2017"
-		]
-	},
-	"include": [
-		"./src/**/*"
-	]
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "module": "commonjs",
+    "target": "es2018",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es2015", "es2017"]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["src/**/*.test.ts"]
 }

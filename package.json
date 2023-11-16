@@ -1,8 +1,9 @@
 {
   "dependencies": {
+    "@sapphire/framework": "^4.7.1",
+    "@sapphire/utilities": "^3.13.0",
     "ajv": "^6.12.3",
-    "discord.js": "^12.5.1",
-    "discord.js-commando": "git+https://github.com/discordjs/Commando.git#198d7604e3725ee88dceab9b5f296edb1b7580a5",
+    "discord.js": "^14.8.0",
     "dotenv": "^5.0.1",
     "fp-ts": "^1.14.4",
     "io-ts": "^1.8.2",
@@ -11,18 +12,16 @@
     "on-change": "^0.1.0"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.1",
     "@types/minimist": "^1.2.0",
     "@types/node": "^10.12.30",
     "@types/ws": "^7.2.3",
-    "jest": "^27.1.0",
-    "tsc-watch": "^5.0.3",
-    "tslint": "^5.13.1",
-    "tslint-config-standard": "^7.1.0",
-    "typescript": "^3.9.7"
+    "tsc-watch": "^6.0.0",
+    "typescript": "^5.0.3"
   },
   "scripts": {
     "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "dev:debug": "tsc-watch --onSuccess \"node --inspect dist/index.js\"",
     "test": "tsc && jest dist"
-  }
+  },
+  "main": "dist/index.js"
 }

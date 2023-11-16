@@ -36,7 +36,7 @@ export const MotionMajorityType = new t.Type(
 
       if (str.endsWith("%")) {
         return t.number
-          .decode(Number(str.substr(0, str.length - 1)))
+          .decode(Number(str.substring(0, str.length - 1)))
           .chain((number) => {
             if (Number.isNaN(number) || number < 0 || number > 100) {
               return t.failure(i, c, "Invalid percentage: must be 0-100")
@@ -61,7 +61,7 @@ export const MotionMajorityType = new t.Type(
       return t.failure(
         i,
         c,
-        "Must provide majority type as percentage or fraction."
+        "Must provide majority type as percentage or fraction"
       )
     })
   },
@@ -71,6 +71,7 @@ export const MotionMajorityType = new t.Type(
 export const MotionOptions = t.exact(
   t.partial({
     majority: MotionMajorityType,
+    showChart: t.boolean,
   })
 )
 export type MotionOptions = t.TypeOf<typeof MotionOptions>
