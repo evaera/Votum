@@ -1,29 +1,21 @@
+import { PieceContext } from "@sapphire/framework"
 import { Message } from "discord.js"
-import { CommandoClient, CommandoMessage } from "discord.js-commando"
-import Command from "../Command"
+import ICommand from "../ICommand"
 
-export default class CouncilCommand extends Command {
-  constructor(client: CommandoClient) {
+export class CouncilCommand extends ICommand {
+  public constructor(client: PieceContext) {
     super(client, {
-      name: "council",
-      description:
-        "Designates the channel this command is run in as a council channel.",
+      name: 'council',
+      aliases: [],
+      description: "Designates the channel this command is run in as a council channel.",
       councilOnly: false,
-      adminOnly: true,
-
-      args: [
-        {
-          key: "name",
-          prompt: 'The name of this council, or "remove" to remove.',
-          type: "string",
-          default: "Council",
-        },
-      ],
-    })
+      adminOnly: true
+    });
   }
 
-  async execute(msg: CommandoMessage, args: any): Promise<Message | Message[]> {
-    if (args.name === "remove") {
+  async execute(msg: Message): Promise<Message | Message[]> {
+    let args = msg.toString().split(" ").slice(1).join(" ")
+    if (args === "remove") {
       if (this.council.enabled) {
         this.council.enabled = false
         return msg.reply(
@@ -32,20 +24,20 @@ export default class CouncilCommand extends Command {
       } else {
         return msg.reply("There is no council enabled in this channel.")
       }
-    }
-
-    if (this.council.enabled) {
-      if (this.council.name !== args.name) {
-        this.council.name = args.name
-        return msg.reply(`Changed this council's name to "${args.name}"`)
-      } else {
-        return msg.reply(`This council already exists.`)
-      }
     } else {
-      this.council.enabled = true
-      this.council.name = args.name
-
-      return msg.reply(`Created council "${args.name}"`)
+      if (args == "") args = "Council";
+      if (this.council.enabled) {
+        if (this.council.name !== args) {
+          this.council.name = args
+          return msg.reply(`Changed this council's name to "${args}"`)
+        } else {
+          return msg.reply(`This council already exists.`)
+        }
+      } else {
+        this.council.enabled = true
+        this.council.name = args
+        return msg.reply(`Created council "${args}"`)
+      }
     }
   }
 }
